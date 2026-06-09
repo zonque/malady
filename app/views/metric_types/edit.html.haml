@@ -1,0 +1,15 @@
+.card.card-pad
+  %h1.page-title.mb-4= t(".title", name: @metric.name)
+  = form_with url: edit_metric_metric_type_path(@metric), method: :get do |f|
+    = f.select :target_type, Metric::DATA_TYPES, { selected: @target_type }, class: "form-select", onchange: "this.form.requestSubmit()"
+  - if @report
+    %p.mt-4.text-sm.text-gray-600.dark:text-gray-400= t(".convert_report", convertible: @report.convertible, total: @report.total, failing: @report.failing)
+    - if @report.samples.any?
+      .alert.alert-error.mt-3
+        %p.font-medium.mb-1= t(".examples_label")
+        %ul.list-disc.pl-5
+          - @report.samples.each do |s|
+            %li= s
+    = form_with url: metric_metric_type_path(@metric), method: :patch do |f|
+      = f.hidden_field :target_type, value: @target_type
+      = f.submit t(".apply"), class: "btn btn-danger mt-4", data: { turbo_confirm: t(".apply_confirm") }

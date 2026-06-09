@@ -1,0 +1,16 @@
+.card.card-pad
+  %h1.page-title.mb-4= @user.email
+  %dl.space-y-2.text-sm
+    %div.flex.gap-4
+      %dt.font-medium.text-gray-500.dark:text-gray-400.w-24= t(".confirmed")
+      %dd= @user.confirmed? ? t(".yes") : t(".no")
+    %div.flex.gap-4
+      %dt.font-medium.text-gray-500.dark:text-gray-400.w-24= t(".locked")
+      %dd= @user.access_locked? ? t(".yes") : t(".no")
+    %div.flex.gap-4
+      %dt.font-medium.text-gray-500.dark:text-gray-400.w-24= t(".admin")
+      %dd= @user.admin? ? t(".yes") : t(".no")
+    %div.flex.gap-4
+      %dt.font-medium.text-gray-500.dark:text-gray-400.w-24= t(".metrics")
+      %dd= @user.metrics.count
+= link_to t(".back"), admin_users_path, class: "link mt-4 inline-block"

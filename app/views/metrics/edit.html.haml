@@ -1,0 +1,9 @@
+.mb-6.flex.items-center.justify-between.gap-3
+  %h1.page-title= t(".title")
+  = link_to t(".change_type"), edit_metric_metric_type_path(@metric), class: "btn btn-secondary btn-sm"
+= render "form", metric: @metric
+
+.mt-8.rounded-lg.border.border-red-200.p-4.dark:border-red-900
+  %h2.text-sm.font-semibold.text-red-700.dark:text-red-400= t(".danger_zone")
+  %p.mt-1.text-sm.text-gray-500.dark:text-gray-400= t(".delete_hint")
+  = button_to t(".delete"), metric_path(@metric), method: :delete, class: "btn btn-danger btn-sm mt-3", data: { turbo_confirm: t(".delete_confirm") }

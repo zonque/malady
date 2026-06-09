@@ -1,0 +1,85 @@
+# Malady — docker compose stack (PostgreSQL + the app).
+# All app configuration is via the `app.environment` section below; every value
+# is a sensible default or a clearly-marked placeholder you should change.
+# (In development you'd normally use `bin/dev` + SQLite; outgoing mail is
+#  previewed in the browser via letter_opener, so no SMTP service is needed.)
+
+services:
+    db:
+        image: postgres:18
+        environment:
+            POSTGRES_DB: malady_production
+            POSTGRES_USER: malady
+            POSTGRES_PASSWORD: malady
+        ports:
+            - "5432:5432"
+        volumes:
+            - malady_pg:/var/lib/postgresql
+
+    app:
+        image: ghcr.io/zonque/malady:main
+        command: bundle exec rails s
+        restart: always
+        depends_on:
+            - db
+        ports:
+            - "3000:3000"
+        environment:
+            # --- Rails runtime ---
+            RAILS_ENV: production
+            # REQUIRED in production. Generate one with `bin/rails secret`.
+            SECRET_KEY_BASE: change-me-to-a-long-random-secret
+            RAILS_LOG_TO_STDOUT: "true"
+
+            # --- Database (points at the `db` service above) ---
+            DATABASE_HOST: db
+            DATABASE_PORT: "5432"
+            DATABASE_NAME: malady_production
+            DATABASE_USER: malady
+            DATABASE_PASSWORD: malady
+
+            # --- Sign-ups: true/1/yes/on opens public registration; anything else closes it ---
+            MALADY_ALLOW_SIGNUPS: "false"
+
+            # --- Admin account (auto-provisioned on boot; password min 6 chars) ---
+            MALADY_ADMIN_EMAIL: admin@example.com
+            MALADY_ADMIN_PASSWORD: change-me-please
+
+            # --- URLs & sender used in outgoing mail ---
+            MALADY_HOST: localhost
+            MALADY_MAILER_SENDER: no-reply@malady.local
+
+            # --- SMTP (production email delivery) ---
+            MALADY_SMTP_ADDRESS: smtp.example.com
+            MALADY_SMTP_PORT: "587"
+            MALADY_SMTP_USER_NAME: ""
+            MALADY_SMTP_PASSWORD: ""
+            MALADY_SMTP_DOMAIN: example.com
+            MALADY_SMTP_AUTHENTICATION: plain
+            MALADY_SMTP_STARTTLS: "true"
+
+            # --- Error notifications (optional; emails sent only when this is set) ---
+            MALADY_EXCEPTION_RECIPIENTS: ""
+
+    # Grafana for visualising Malady data via its read-only JSON API.
+    # The Infinity datasource plugin is auto-installed (needs internet on first
+    # start). Reachable at http://localhost:3001 (default login admin / admin).
+    # Point an Infinity datasource at http://app:3000/api/v1 and authenticate with
+    # a Bearer token from Malady's /api_token page — see the README.
+    grafana:
+        image: grafana/grafana:latest
+        restart: always
+        depends_on:
+            - app
+        ports:
+            - "3001:3000"
+        environment:
+            GF_SECURITY_ADMIN_USER: admin
+            GF_SECURITY_ADMIN_PASSWORD: admin
+            GF_INSTALL_PLUGINS: yesoreyeram-infinity-datasource
+        volumes:
+            - grafana_data:/var/lib/grafana
+
+volumes:
+    malady_pg:
+    grafana_data:

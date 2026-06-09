@@ -1,0 +1,6 @@
+%label.form-label= t(".enum_options_label")
+%div{ data: { enum_options_target: "list" } }
+  - Array(f.object.enum_options).each do |opt|
+    .flex.mb-2
+      = text_field_tag "metric[enum_options][]", opt, class: "form-input"
+%button.btn.btn-secondary.btn-sm{ type: "button", data: { action: "enum-options#add" } }= t(".add_choice")

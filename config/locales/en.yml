@@ -1,0 +1,218 @@
+en:
+  app_name: "Malady"
+
+  boolean:
+    "yes": "Yes"
+    "no": "No"
+
+  metrics:
+    types:
+      decimal: "Decimal"
+      integer: "Integer"
+      percentage: "Percentage"
+      boolean: "Yes / No"
+      enumeration: "Choice"
+      text: "Text"
+    index:
+      new_metric: "New metric"
+    new:
+      title: "New metric"
+    edit:
+      title: "Edit metric"
+      change_type: "Change type"
+      danger_zone: "Danger zone"
+      delete_hint: "Permanently delete this metric and all of its data points."
+      delete: "Delete metric"
+      delete_confirm: "Delete this metric and all its data points? This cannot be undone."
+    show:
+      back: "← Dashboard"
+      edit: "Edit"
+    form:
+      cancel: "Cancel"
+      unit_placeholder: "e.g. kg, bpm, °C"
+    enum_options:
+      enum_options_label: "Choices"
+      add_choice: "+ Add choice"
+    create:
+      created: "Metric created."
+    update:
+      updated: "Metric updated."
+    destroy:
+      deleted: "Metric deleted."
+
+  nav:
+    dashboard: "Dashboard"
+    overview: "Overview"
+    admin: "Admin"
+    log_out: "Log out"
+    toggle_dark_mode: "Toggle dark mode"
+
+  dashboard:
+    show:
+      title: "Your metrics"
+      log_readings: "Log readings"
+      new_metric: "New metric"
+      reading:
+        one: "%{count} reading"
+        other: "%{count} readings"
+      no_readings_yet: "No readings yet"
+      no_metrics_heading: "No metrics yet."
+      create_first_metric: "Create your first metric"
+      export_json: "Export JSON"
+      export_csv: "Export CSV"
+      api_token: "API token"
+      drag_to_reorder: "Drag to reorder"
+
+  data_points:
+    timeline:
+      log_a_reading: "Log a reading"
+      newer: "← Newer"
+      older: "Older →"
+      page_of: "Page %{page} of %{total}"
+    form:
+      note_placeholder: "note (optional)"
+      add_reading: "Add reading"
+    edit:
+      title: "Edit entry"
+    update:
+      updated: "Updated."
+
+  metric_types:
+    edit:
+      title: "Change type of %{name}"
+      convert_report: "%{convertible} of %{total} values will convert; %{failing} will fail."
+      examples_label: "Examples that won't convert:"
+      apply: "Apply change"
+      apply_confirm: "Failing values keep their original text but lose typed projection. Continue?"
+    update:
+      unknown_type: "Unknown type."
+      changed: "Type changed to %{type}."
+
+  time:
+    formats:
+      ov_day_header: "%A, %b %-d, %Y"
+      ov_week_date: "%b %-d, %Y"
+      ov_month_header: "%B %Y"
+      ov_day_point: "%H:%M"
+      ov_week_point: "%a %H:%M"
+      ov_month_point: "%b %-d, %H:%M"
+
+  overviews:
+    show:
+      title: "Overview"
+      plot_lines: "Plot lines"
+      reading:
+        one: "%{count} reading"
+        other: "%{count} readings"
+      newer: "← Newer"
+      older: "Older →"
+      page_of: "Page %{page} of %{total}"
+      no_data: "No data yet."
+      min_max_avg: "min %{min} · max %{max} · avg %{avg}"
+      period_label:
+        week: "Week of %{date} · CW %{cw}"
+
+  quick_entries:
+    new:
+      title: "Log readings"
+      time_label: "Time"
+      log_readings: "Log readings"
+      cancel: "Cancel"
+      no_metrics_heading: "You have no metrics yet."
+      create_metric: "Create a metric"
+    create:
+      logged:
+        one: "Logged %{count} reading."
+        other: "Logged %{count} readings."
+      no_values: "Fill in at least one value to log."
+      invalid: "Some values couldn't be saved — nothing was logged."
+
+  admin:
+    users:
+      index:
+        title: "Users"
+        email: "Email"
+        status: "Status"
+        admin_col: "Admin"
+        status_locked: "locked"
+        status_active: "active"
+        status_unconfirmed: "unconfirmed"
+        confirm: "Confirm"
+        unlock: "Unlock"
+        lock: "Lock"
+        delete: "Delete"
+        delete_confirm: "Delete %{email}?"
+      show:
+        confirmed: "Confirmed"
+        locked: "Locked"
+        admin: "Admin"
+        metrics: "Metrics"
+        yes: "yes"
+        no: "no"
+        back: "Back"
+      destroy:
+        deleted: "User deleted."
+      lock:
+        locked: "User locked."
+      unlock:
+        unlocked: "User unlocked."
+      confirm:
+        confirmed: "User confirmed."
+
+  api_tokens:
+    show:
+      title: "API token"
+      description: "Use this as a Bearer token in Grafana's Infinity datasource."
+      endpoints: "Endpoints:"
+      regenerate: "Regenerate token"
+      regenerate_confirm: "The old token stops working immediately. Continue?"
+    update:
+      regenerated: "API token regenerated."
+
+  devise:
+    sessions:
+      new:
+        title: "Log in"
+        submit: "Log in"
+    registrations:
+      new:
+        title: "Sign up"
+        submit: "Sign up"
+        password_min: "(%{count} characters minimum)"
+      edit:
+        title: "Edit %{resource}"
+        password_leave_blank: "(leave blank if you don't want to change it)"
+        password_min: "%{count} characters minimum"
+        password_current_hint: "(we need your current password to confirm your changes)"
+        submit: "Update"
+        cancel_account_heading: "Cancel my account"
+        cancel_account_unhappy: "Unhappy?"
+        cancel_account_button: "Cancel my account"
+        cancel_account_confirm: "Are you sure?"
+        back: "Back"
+        pending_reconfirmation: "Currently waiting confirmation for: %{email}"
+    passwords:
+      new:
+        title: "Forgot your password?"
+        submit: "Send me password reset instructions"
+      edit:
+        title: "Change your password"
+        new_password: "New password"
+        confirm_new_password: "Confirm new password"
+        submit: "Change my password"
+        password_min: "(%{count} characters minimum)"
+    confirmations:
+      new:
+        title: "Resend confirmation instructions"
+        submit: "Resend confirmation instructions"
+    unlocks:
+      new:
+        title: "Resend unlock instructions"
+        submit: "Resend unlock instructions"
+    shared:
+      links:
+        log_in: "Log in"
+        sign_up: "Sign up"
+        forgot_password: "Forgot your password?"
+        no_confirmation: "Didn't receive confirmation instructions?"
+        no_unlock: "Didn't receive unlock instructions?"
