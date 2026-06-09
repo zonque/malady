@@ -9,6 +9,8 @@ without losing the original values**.
 Built with Ruby on Rails 8, Hotwire, and Tailwind CSS. Mobile-first, with an
 optional dark mode. Licensed under **AGPL-3.0** (see [License](#license)).
 
+![Malady dashboard](screenshots/dashboard.png)
+
 ---
 
 ## Table of contents
