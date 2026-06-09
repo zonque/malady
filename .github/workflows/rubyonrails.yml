@@ -1,0 +1,113 @@
+# This workflow uses actions that are not certified by GitHub.  They are
+# provided by a third-party and are governed by separate terms of service,
+# privacy policy, and support documentation.
+#
+# This workflow will install a prebuilt Ruby version, install dependencies, and
+# run tests and linters.
+name: "Ruby on Rails CI"
+on:
+    push:
+        branches: ["main", "devel"]
+    pull_request:
+        branches: ["main"]
+jobs:
+    test:
+        runs-on: ubuntu-24.04
+        services:
+            postgres:
+                image: postgres:18-alpine
+                ports:
+                    - "5432:5432"
+                env:
+                    POSTGRES_DB: rails_test
+                    POSTGRES_USER: rails
+                    POSTGRES_PASSWORD: password
+        env:
+            RAILS_ENV: test
+            DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            # Add or replace dependency steps here
+            - name: Install Ruby and gems
+              uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
+              with:
+                  bundler-cache: true
+            # Add or replace database setup steps here
+            - name: Set up database schema
+              run: bundle exec rails db:schema:load
+            # Add or replace test runners here
+            - name: Run tests
+              run: RAILS_ENV=test bundle exec rails test
+
+    lint:
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            - name: Install Ruby and gems
+              uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
+              with:
+                  bundler-cache: true
+            - name: Security audit application code
+              run: bundle exec brakeman -q -w2
+
+    build-and-push-image:
+        env:
+            REGISTRY: ghcr.io
+            IMAGE_NAME: ${{ github.repository }}
+
+        runs-on: ubuntu-latest
+        # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
+        permissions:
+            contents: read
+            packages: write
+            attestations: write
+            id-token: write
+            #
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            # Uses the `docker/login-action` action to log in to the Container registry registry using the account and password that will publish the packages. Once published, the packages are scoped to the account defined here.
+            - name: Log in to the Container registry
+              uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            # This step uses [docker/metadata-action](https://github.com/docker/metadata-action#about) to extract tags and labels that will be applied to the specified image. The `id` "meta" allows the output of this step to be referenced in a subsequent step. The `images` value provides the base name for the tags and labels.
+            - name: Extract metadata (tags, labels) for Docker
+              id: meta
+              uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v6.1.0
+              with:
+                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            - name: Extract branch name
+              shell: bash
+              run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+              id: extract_branch
+            # This step uses the `docker/build-push-action` action to build the image, based on your repository's `Dockerfile`. If the build succeeds, it pushes the image to GitHub Packages.
+            # It uses the `context` parameter to define the build's context as the set of files located in the specified path. For more information, see [Usage](https://github.com/docker/build-push-action#usage) in the README of the `docker/build-push-action` repository.
+            # It uses the `tags` and `labels` parameters to tag and label the image with the output from the "meta" step.
+            - name: Build and push Docker image
+              id: push
+              uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+              with:
+                  context: .
+                  push: true
+                  tags: ${{ steps.meta.outputs.branch }},${{ steps.meta.outputs.tags }}
+                  labels: ${{ steps.meta.outputs.labels }}
+
+            # This step generates an artifact attestation for the image, which is an unforgeable statement about where and how it was built. It increases supply chain security for people who consume the image. For more information, see [Using artifact attestations to establish provenance for builds](/actions/security-guides/using-artifact-attestations-to-establish-provenance-for-builds).
+            - name: Generate artifact attestation
+              uses: actions/attest-build-provenance@a2bbfa25375fe432b6a289bc6b6cd05ecd0c4c32 # v4.1.0
+              with:
+                  subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+                  subject-digest: ${{ steps.push.outputs.digest }}
+                  push-to-registry: true
+
+            - name: Prune old package versions
+              uses: actions/delete-package-versions@e5bc658cc4c965c472efe991f8beea3981499c55 # v5.0.0
+              with:
+                  package-name: "malady"
+                  package-type: "container"
+                  min-versions-to-keep: 10

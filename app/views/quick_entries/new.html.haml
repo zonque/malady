@@ -1,0 +1,19 @@
+%h1.page-title.mb-4= t(".title")
+- if @metrics.any?
+  = form_with url: quick_entry_path, method: :post, class: "card card-pad space-y-4" do |f|
+    %div
+      = label_tag :recorded_at, t(".time_label"), class: "form-label"
+      = datetime_field_tag :recorded_at, (@recorded_at.respond_to?(:strftime) ? @recorded_at.strftime("%Y-%m-%dT%H:%M") : @recorded_at), class: "form-input"
+    - @metrics.each do |metric|
+      %div
+        = label_tag "values_#{metric.id}", "#{metric.name}#{" (#{metric.unit})" if metric.unit.present?}", class: "form-label"
+        = metric_value_input(metric, name: "values[#{metric.id}]", value: @values[metric.id], id: "values_#{metric.id}")
+        - if @drafts[metric.id]&.errors&.any?
+          %p.mt-1.text-sm.text-red-600= @drafts[metric.id].errors.full_messages.to_sentence
+    .flex.gap-2.pt-2
+      = f.submit t(".log_readings"), class: "btn btn-primary"
+      = link_to t(".cancel"), root_path, class: "btn btn-secondary"
+- else
+  .card.card-pad.text-center.text-gray-500.dark:text-gray-400
+    %p.mb-3= t(".no_metrics_heading")
+    = link_to t(".create_metric"), new_metric_path, class: "btn btn-primary"

@@ -1,0 +1,30 @@
+%h1.page-title.mb-6= t(".title")
+.card
+  %table.w-full.text-left.text-sm
+    %thead
+      %tr.text-xs.font-medium.text-gray-500.uppercase.tracking-wider.dark:text-gray-400
+        %th.px-4.py-3= t(".email")
+        %th.px-4.py-3= t(".status")
+        %th.px-4.py-3= t(".admin_col")
+        %th.px-4.py-3
+    %tbody
+      - @users.each do |user|
+        %tr.border-t.border-gray-100.dark:border-gray-800{ id: dom_id(user) }
+          %td.px-4.py-3= link_to user.email, admin_user_path(user), class: "link"
+          %td.px-4.py-3
+            - if user.access_locked?
+              %span.badge.badge-gray= t(".status_locked")
+            - elsif user.confirmed?
+              %span.badge= t(".status_active")
+            - else
+              %span.badge.badge-gray= t(".status_unconfirmed")
+          %td.px-4.py-3= user.admin? ? "✓" : ""
+          %td.px-4.py-3.flex.gap-2.flex-wrap
+            - unless user.confirmed?
+              = button_to t(".confirm"), confirm_admin_user_path(user), method: :post, class: "btn btn-ghost btn-sm"
+            - unless user == current_user
+              - if user.access_locked?
+                = button_to t(".unlock"), unlock_admin_user_path(user), method: :post, class: "btn btn-ghost btn-sm"
+              - else
+                = button_to t(".lock"), lock_admin_user_path(user), method: :post, class: "btn btn-ghost btn-sm"
+              = button_to t(".delete"), admin_user_path(user), method: :delete, data: { turbo_confirm: t(".delete_confirm", email: user.email) }, class: "btn btn-ghost btn-sm text-red-600"

@@ -1,0 +1,5 @@
+%h1.text-xl.font-bold= t("app_name")
+= link_to t(".new_metric"), new_metric_path, class: "text-blue-600"
+%ul
+  - @metrics.each do |metric|
+    %li= link_to metric.name, metric_path(metric)

@@ -1,0 +1,11 @@
+= form_with model: [metric, data_point], data: { turbo_stream: true }, class: "space-y-3" do |f|
+  - if data_point.errors.any?
+    .alert.alert-error
+      %ul.list-disc.pl-5
+        - data_point.errors.full_messages.each do |m|
+          %li= m
+  .grid.gap-3.sm:grid-cols-3
+    = f.datetime_field :recorded_at, class: "form-input"
+    = metric_value_input(metric, name: "data_point[value]", value: data_point.value_text)
+    = f.text_field :note, placeholder: t(".note_placeholder"), class: "form-input"
+  = f.submit t(".add_reading"), class: "btn btn-primary"

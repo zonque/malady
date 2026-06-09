@@ -1,0 +1,41 @@
+.mb-6.flex.flex-wrap.items-center.justify-between.gap-3
+  %h1.page-title= t(".title")
+  .flex.flex-wrap.gap-2
+    = link_to t(".log_readings"), new_quick_entry_path, class: "btn btn-primary"
+    = link_to t(".new_metric"), new_metric_path, class: "btn btn-secondary"
+
+- if @metrics.any?
+  %ul.space-y-3{ data: { controller: "reorder" } }
+    - @metrics.each do |metric|
+      %li.card.flex.items-start.gap-2.py-3.pl-2.pr-4.transition.hover:border-indigo-300.dark:hover:border-indigo-700{ id: dom_id(metric), data: { reorder_target: "item", id: metric.id } }
+        %span.shrink-0.cursor-move.select-none.px-1.pt-1.text-lg.text-gray-300.hover:text-gray-500.dark:text-gray-600{ data: { reorder_target: "handle" }, draggable: "true", title: t(".drag_to_reorder"), "aria-label": t(".drag_to_reorder") } ⠿
+        = link_to metric_path(metric), class: "block min-w-0 flex-1" do
+          .flex.items-center.justify-between.gap-3
+            .min-w-0
+              %span.font-semibold.text-gray-900.dark:text-white= metric.name
+              - if metric.unit.present?
+                %span.ml-2.text-sm.text-gray-500.dark:text-gray-400= metric.unit
+              .mt-1.text-xs.text-gray-500.dark:text-gray-400
+                - count = @counts[metric.id] || 0
+                = t(".reading", count: count)
+                - if (last = @last_recorded[metric.id])
+                  %span.mx-1 ·
+                  %span last
+                  %time{ data: { controller: "local-time", local_time_target: "time" }, datetime: last.utc.iso8601 }= last.utc.iso8601
+                - else
+                  %span.mx-1 ·
+                  %span= t(".no_readings_yet")
+            %span.badge= t("metrics.types.#{metric.data_type}")
+          - if metric_chartable?(metric)
+            - spark = metric_chart_data(metric)&.last(30)
+            - if spark && spark.size > 1
+              .mt-2= line_chart spark, height: "44px", points: false, colors: ["#6366f1"], library: { scales: { x: { display: false }, y: { display: false } }, plugins: { legend: { display: false }, tooltip: { enabled: false } }, elements: { line: { borderWidth: 2 } } }
+- else
+  .card.card-pad.text-center.text-gray-500.dark:text-gray-400
+    %p.mb-3= t(".no_metrics_heading")
+    = link_to t(".create_first_metric"), new_metric_path, class: "btn btn-primary"
+
+.mt-8.flex.flex-wrap.gap-4.border-t.border-gray-200.pt-4.text-sm.dark:border-gray-800
+  = link_to t(".export_json"), json_export_path(format: :json), class: "link"
+  = link_to t(".export_csv"), csv_export_path(format: :csv), class: "link"
+  = link_to t(".api_token"), api_token_path, class: "link"

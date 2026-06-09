@@ -1,0 +1,14 @@
+= link_to t(".back"), root_path, class: "link text-sm"
+.mb-6.flex.items-center.justify-between.gap-3
+  %div
+    %h1.page-title= @metric.name
+    %span.badge.mt-1= t("metrics.types.#{@metric.data_type}")
+    - if @metric.unit.present?
+      %span.ml-1.text-sm.text-gray-500= @metric.unit
+  = link_to t(".edit"), edit_metric_path(@metric), class: "btn btn-secondary btn-sm"
+- if metric_chartable?(@metric)
+  - chart_data = metric_chart_data(@metric)
+  - if chart_data.present?
+    .card.card-pad.mb-6
+      = line_chart chart_data, height: "260px", colors: ["#4f46e5"], points: false
+= render "data_points/timeline", metric: @metric, data_points: @data_points, data_point: @data_point, page: @page, total_pages: @total_pages
