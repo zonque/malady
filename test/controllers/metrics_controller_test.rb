@@ -25,6 +25,17 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to metric_path(@user.metrics.order(:created_at).last)
   end
 
+  test "create stores the metric note" do
+    post metrics_path, params: { metric: { name: "Weight", data_type: "decimal", note: "Morning, before food" } }
+    assert_equal "Morning, before food", @user.metrics.order(:created_at).last.note
+  end
+
+  test "metric form has a note input" do
+    get new_metric_path
+    assert_response :success
+    assert_select "input[name=?]", "metric[note]"
+  end
+
   test "new metric form offers the Scale (0-5) preset" do
     get new_metric_path
     assert_response :success

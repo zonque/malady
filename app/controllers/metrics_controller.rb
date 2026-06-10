@@ -50,7 +50,7 @@ class MetricsController < ApplicationController
   end
 
   def metric_params
-    permitted = params.require(:metric).permit(:name, :description, :data_type, :unit, :color, :position, :active, :ignore_time, enum_options: [])
+    permitted = params.require(:metric).permit(:name, :description, :note, :data_type, :unit, :color, :position, :active, :ignore_time, enum_options: [])
     if (preset = Metric::PRESETS[permitted[:data_type]])
       permitted.merge!(preset)
     end
