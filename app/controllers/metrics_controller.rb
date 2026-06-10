@@ -50,6 +50,6 @@ class MetricsController < ApplicationController
   end
 
   def metric_params
-    params.require(:metric).permit(:name, :description, :data_type, :unit, :color, :position, :active, enum_options: [])
+    params.require(:metric).permit(:name, :description, :data_type, :unit, :color, :position, :active, :ignore_time, enum_options: [])
   end
 end

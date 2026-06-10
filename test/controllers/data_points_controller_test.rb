@@ -28,6 +28,34 @@ class DataPointsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "ignore_time metric create from a date string stores a full timestamp" do
+    metric = @user.metrics.create!(name: "Episode", data_type: "boolean", ignore_time: true)
+    travel_to Time.utc(2026, 3, 4, 14, 30) do
+      post metric_data_points_path(metric),
+           params: { data_point: { recorded_at: "2026-03-04", value: "true" } },
+           as: :turbo_stream
+      dp = metric.data_points.last
+      assert_in_delta Time.current.to_i, dp.recorded_at.to_i, 60
+    end
+  end
+
+  test "ignore_time metric renders a date-only input and hides time in the timeline" do
+    metric = @user.metrics.create!(name: "Episode", data_type: "boolean", ignore_time: true)
+    metric.data_points.create!(recorded_at: Time.utc(2026, 3, 4, 14, 30), value: "true")
+    get metric_path(metric)
+    assert_response :success
+    assert_select "input[type=date][name=?]", "data_point[recorded_at]"
+    assert_select "#data_points time[data-date-only]"
+  end
+
+  test "normal metric renders a datetime input without the date-only flag" do
+    @metric.data_points.create!(recorded_at: Time.utc(2026, 3, 4, 14, 30), value: "1")
+    get metric_path(@metric)
+    assert_response :success
+    assert_select "input[type=?][name=?]", "datetime-local", "data_point[recorded_at]"
+    assert_select "#data_points time[data-date-only]", count: 0
+  end
+
   test "destroy removes the data point" do
     dp = @metric.data_points.create!(recorded_at: Time.utc(2026, 1, 1), value: "1")
     assert_difference -> { @metric.data_points.count }, -1 do

@@ -33,6 +33,19 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_match "2026-02-01T08:00:00Z", response.body
   end
 
+  test "ignore_time metric flags its last-recorded time as date-only" do
+    user = confirmed_user(email: "dateonly@m.test")
+    m = user.metrics.create!(name: "Episode", data_type: "boolean", ignore_time: true)
+    m.data_points.create!(recorded_at: Time.utc(2026, 2, 1, 8), value: "true")
+    normal = user.metrics.create!(name: "Weight", data_type: "decimal")
+    normal.data_points.create!(recorded_at: Time.utc(2026, 2, 1, 8), value: "70")
+    sign_in user
+    get root_path
+    assert_response :success
+    assert_select "##{dom_id(m)} time[data-date-only]"
+    assert_select "##{dom_id(normal)} time[data-date-only]", count: 0
+  end
+
   test "reorder updates metric positions" do
     user = confirmed_user(email: "r@m.test")
     a = user.metrics.create!(name: "A", data_type: "text", position: 0)

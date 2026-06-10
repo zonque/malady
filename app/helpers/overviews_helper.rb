@@ -23,8 +23,10 @@ module OverviewsHelper
     end
   end
 
-  def overview_point_time(time, period, zone)
+  def overview_point_time(time, period, zone, ignore_time: false)
     local = time.in_time_zone(zone)
+    return I18n.l(local, format: :ov_point_date) if ignore_time
+
     format = case period
     when "week" then :ov_week_point
     when "month" then :ov_month_point

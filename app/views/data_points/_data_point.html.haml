@@ -1,6 +1,6 @@
 %li.card.flex.items-center.justify-between.gap-3.px-4.py-3{ id: dom_id(data_point), data: { controller: "local-time" } }
   .min-w-0
-    %time.block.text-xs.text-gray-500.dark:text-gray-400{ data: { local_time_target: "time" }, datetime: data_point.recorded_at.iso8601 }= data_point.recorded_at.iso8601
+    %time.block.text-xs.text-gray-500.dark:text-gray-400{ data: { local_time_target: "time" }.merge(metric.ignore_time? ? { date_only: true } : {}), datetime: data_point.recorded_at.iso8601 }= data_point.recorded_at.iso8601
     -# value_text is the canonical display string; data_point.value would render a BigDecimal as "0.725e2".
     %span.font-mono.text-gray-900.dark:text-gray-100= data_point.value_text
     - if data_point.note.present?

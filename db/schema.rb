@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_08_203653) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_10_223600) do
   create_table "data_points", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "metric_id", null: false
@@ -31,6 +31,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_08_203653) do
     t.string "data_type"
     t.text "description"
     t.text "enum_options", default: "[]", null: false
+    t.boolean "ignore_time", default: false, null: false
     t.string "name"
     t.integer "position", default: 0, null: false
     t.string "slug"

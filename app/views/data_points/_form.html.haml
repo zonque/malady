@@ -5,9 +5,14 @@
         - data_point.errors.full_messages.each do |m|
           %li= m
   .grid.gap-3.sm:grid-cols-3
-    -# Minute precision (no seconds): a seconds-bearing value is a step mismatch
-    -# that Firefox/Android treats as invalid and refuses to submit.
-    = f.datetime_field :recorded_at, class: "form-input", step: 60, value: data_point.recorded_at&.strftime("%Y-%m-%dT%H:%M")
+    - if metric.ignore_time?
+      -# The metric ignores time: a date-only picker. The stored time-of-day is
+      -# preserved server-side (see DataPoint#keep_time_of_day_when_ignored).
+      = f.date_field :recorded_at, class: "form-input", value: data_point.recorded_at&.strftime("%Y-%m-%d")
+    - else
+      -# Minute precision (no seconds): a seconds-bearing value is a step mismatch
+      -# that Firefox/Android treats as invalid and refuses to submit.
+      = f.datetime_field :recorded_at, class: "form-input", step: 60, value: data_point.recorded_at&.strftime("%Y-%m-%dT%H:%M")
     = metric_value_input(metric, name: "data_point[value]", value: data_point.value_text)
     = f.text_field :note, placeholder: t(".note_placeholder"), class: "form-input"
   = f.submit t(".add_reading"), class: "btn btn-primary"

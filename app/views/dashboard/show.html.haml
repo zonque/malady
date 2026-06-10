@@ -21,7 +21,7 @@
                 - if (last = @last_recorded[metric.id])
                   %span.mx-1 ·
                   %span last
-                  %time{ data: { controller: "local-time", local_time_target: "time" }, datetime: last.utc.iso8601 }= last.utc.iso8601
+                  %time{ data: { controller: "local-time", local_time_target: "time" }.merge(metric.ignore_time? ? { date_only: true } : {}), datetime: last.utc.iso8601 }= last.utc.iso8601
                 - else
                   %span.mx-1 ·
                   %span= t(".no_readings_yet")

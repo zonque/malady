@@ -30,6 +30,7 @@ en:
     form:
       cancel: "Cancel"
       unit_placeholder: "e.g. kg, bpm, °C"
+      ignore_time_label: "Ignore time (record date only)"
     enum_options:
       enum_options_label: "Choices"
       add_choice: "+ Add choice"
@@ -96,6 +97,7 @@ en:
       ov_day_point: "%H:%M"
       ov_week_point: "%a %H:%M"
       ov_month_point: "%b %-d, %H:%M"
+      ov_point_date: "%b %-d, %Y"
 
   overviews:
     show:

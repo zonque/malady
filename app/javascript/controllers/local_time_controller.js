@@ -5,7 +5,10 @@ export default class extends Controller {
   connect() {
     this.timeTargets.forEach((el) => {
       const utc = el.getAttribute("datetime")
-      if (utc) el.textContent = new Date(utc).toLocaleString()
+      if (!utc) return
+      const date = new Date(utc)
+      // Metrics that ignore time render the date only (see DataPoint#ignore_time).
+      el.textContent = el.dataset.dateOnly ? date.toLocaleDateString() : date.toLocaleString()
     })
   }
 }

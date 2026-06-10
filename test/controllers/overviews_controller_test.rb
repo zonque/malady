@@ -56,4 +56,15 @@ class OverviewsControllerTest < ActionDispatch::IntegrationTest
     get overview_path(period: "day", metrics: [ @m.slug ])
     assert_response :success
   end
+
+  test "ignore_time metric hides the time on overview points" do
+    ti = @user.metrics.create!(name: "Episode", data_type: "boolean", ignore_time: true)
+    travel_to Time.utc(2026, 1, 1, 14, 37) do
+      ti.data_points.create!(recorded_at: "2026-01-01", value: "true")
+    end
+    get overview_path(period: "day", metrics: [ ti.slug ])
+    assert_response :success
+    assert_match "Episode", response.body  # the entry is rendered...
+    assert_no_match "14:37", response.body # ...but its time is hidden
+  end
 end
