@@ -15,6 +15,7 @@ optional dark mode. Licensed under **AGPL-3.0** (see [License](#license)).
 
 ## Table of contents
 
+- [Background](#background)
 - [Overview](#overview)
 - [Feature scope](#feature-scope)
 - [Tech stack](#tech-stack)
@@ -28,6 +29,33 @@ optional dark mode. Licensed under **AGPL-3.0** (see [License](#license)).
 - [Production & Docker Compose](#production--docker-compose)
 - [License](#license)
 - [Contributing](#contributing)
+
+---
+
+## Background
+
+A family member has been dealing with a stubborn, hard-to-pin-down malady, and
+we'd love to find the patterns hiding in it. Being nerds, our instinct was
+obvious: collect the data, then go looking. We wanted something dead simple to
+jot readings into throughout the day — at the desk, on the couch, on a phone in
+a waiting room — and then sift through later for whatever the numbers are trying
+to tell us.
+
+So we went looking for a tool. And looking. Everything was either a walled
+garden, a subscription, or quietly shipping our most personal data off to
+someone else's cloud. Open source, self-hostable, and private? Crickets. So I
+did the reasonable thing and started building one.
+
+Right now it does the basics and not much more — but that's the point. It'll
+grow as real life shows us which features actually earn their keep, instead of
+the ones we *think* we need. And, full disclosure: most of this is lovingly
+vibe-coded.
+
+**Got ideas?** We'd genuinely love to hear them. If you can think of a better way
+to track, slice, or visualise this kind of data — or you just want to poke at
+the code — open an issue, send a PR, or start a discussion. Contributions,
+suggestions, and "have you considered…" comments are all very welcome. See
+[Contributing](#contributing) to jump in.
 
 ---
 
