@@ -13,6 +13,8 @@ en:
       boolean: "Yes / No"
       enumeration: "Choice"
       text: "Text"
+    presets:
+      scale_0_5: "Scale (0–5)"
     index:
       new_metric: "New metric"
     new:

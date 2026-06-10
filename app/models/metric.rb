@@ -2,6 +2,13 @@ class Metric < ApplicationRecord
   DATA_TYPES = %w[decimal integer percentage boolean enumeration text].freeze
   NUMERIC_TYPES = %w[decimal integer percentage].freeze
 
+  # Convenience presets selectable on the new-metric form. Each expands into a
+  # real data_type plus pre-filled config — no new column or DATA_TYPE needed.
+  # "scale_0_5" is the existing "choice"/enumeration type seeded with 0..5.
+  PRESETS = {
+    "scale_0_5" => { data_type: "enumeration", enum_options: %w[0 1 2 3 4 5] }
+  }.freeze
+
   belongs_to :user
   has_many :data_points, dependent: :destroy
 

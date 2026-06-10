@@ -25,6 +25,21 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to metric_path(@user.metrics.order(:created_at).last)
   end
 
+  test "new metric form offers the Scale (0-5) preset" do
+    get new_metric_path
+    assert_response :success
+    assert_select "select[name=?] option[value=?]", "metric[data_type]", "scale_0_5"
+  end
+
+  test "create with the scale_0_5 preset builds an enumeration metric with 0..5 options" do
+    assert_difference -> { @user.metrics.count }, 1 do
+      post metrics_path, params: { metric: { name: "Pain", data_type: "scale_0_5" } }
+    end
+    m = @user.metrics.order(:created_at).last
+    assert_equal "enumeration", m.data_type
+    assert_equal %w[0 1 2 3 4 5], m.enum_options
+  end
+
   test "cannot access another user's metric" do
     theirs = @other.metrics.create!(name: "Secret", data_type: "decimal")
     get metric_path(theirs)
