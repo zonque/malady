@@ -57,6 +57,13 @@ class OverviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "overview shows the metric note" do
+    @m.update!(note: "Daily fasting average")
+    get overview_path(period: "day")
+    assert_response :success
+    assert_match "Daily fasting average", response.body
+  end
+
   test "ignore_time metric hides the time on overview points" do
     ti = @user.metrics.create!(name: "Episode", data_type: "boolean", ignore_time: true)
     travel_to Time.utc(2026, 1, 1, 14, 37) do

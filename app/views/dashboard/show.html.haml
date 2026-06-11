@@ -25,6 +25,8 @@
                 - else
                   %span.mx-1 ·
                   %span= t(".no_readings_yet")
+              - if metric.note.present?
+                .metric-note.mt-1.text-xs.italic.text-gray-500.dark:text-gray-400= metric.note
             %span.badge= t("metrics.types.#{metric.data_type}")
           - if metric_chartable?(metric)
             - spark = metric_chart_data(metric)&.last(30)

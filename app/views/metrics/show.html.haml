@@ -6,6 +6,8 @@
     - if @metric.unit.present?
       %span.ml-1.text-sm.text-gray-500= @metric.unit
   = link_to t(".edit"), edit_metric_path(@metric), class: "btn btn-secondary btn-sm"
+- if @metric.note.present?
+  %p.metric-note.mb-6.text-sm.text-gray-600.dark:text-gray-300= @metric.note
 - if metric_chartable?(@metric)
   - chart_data = metric_chart_data(@metric)
   - if chart_data.present?

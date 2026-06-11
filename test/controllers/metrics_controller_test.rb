@@ -36,6 +36,21 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?]", "metric[note]"
   end
 
+  test "metric show displays the note above the entry form" do
+    m = @user.metrics.create!(name: "Weight", data_type: "decimal", note: "Log fasting only")
+    get metric_path(m)
+    assert_response :success
+    assert_match "Log fasting only", response.body
+    assert_operator response.body.index("Log fasting only"), :<, response.body.index("data_point_form")
+  end
+
+  test "metric show omits the note block when there is no note" do
+    m = @user.metrics.create!(name: "Weight", data_type: "decimal")
+    get metric_path(m)
+    assert_response :success
+    assert_select ".metric-note", count: 0
+  end
+
   test "new metric form offers the Scale (0-5) preset" do
     get new_metric_path
     assert_response :success

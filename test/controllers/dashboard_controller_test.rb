@@ -46,6 +46,15 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "##{dom_id(normal)} time[data-date-only]", count: 0
   end
 
+  test "dashboard card shows the metric note" do
+    user = confirmed_user(email: "note-dash@m.test")
+    m = user.metrics.create!(name: "Weight", data_type: "decimal", note: "Morning before food")
+    sign_in user
+    get root_path
+    assert_response :success
+    assert_select "##{dom_id(m)}", text: /Morning before food/
+  end
+
   test "reorder updates metric positions" do
     user = confirmed_user(email: "r@m.test")
     a = user.metrics.create!(name: "A", data_type: "text", position: 0)

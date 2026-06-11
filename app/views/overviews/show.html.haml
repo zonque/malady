@@ -31,6 +31,8 @@
                 .mb-2.flex.items-center.justify-between.gap-2
                   = link_to entry[:metric].name, metric_path(entry[:metric]), class: "font-semibold text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400"
                   %span.badge= t("metrics.types.#{entry[:metric].data_type}")
+                - if entry[:metric].note.present?
+                  .metric-note.mb-2.text-xs.italic.text-gray-500.dark:text-gray-400= entry[:metric].note
                 .mb-2.text-xs.text-gray-500.dark:text-gray-400
                   = t(".reading", count: entry[:count])
                   - if entry[:min]
