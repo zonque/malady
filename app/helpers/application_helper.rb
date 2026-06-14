@@ -50,6 +50,16 @@ module ApplicationHelper
     end
   end
 
+  # Human label for a memory's anniversary interval, e.g. "3 months ago" or
+  # "2 years ago". Whole years (multiples of 12) read as years.
+  def memory_label(months)
+    if (months % 12).zero?
+      t("memories.years_ago", count: months / 12)
+    else
+      t("memories.months_ago", count: months)
+    end
+  end
+
   # Renders a Markdown string to sanitized HTML. Raw/inline HTML is stripped by
   # Redcarpet (filter_html) and again by Rails' sanitize as a defense-in-depth layer.
   def render_markdown(text)

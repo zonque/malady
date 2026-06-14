@@ -4,6 +4,24 @@
     = link_to t(".log_readings"), new_quick_entry_path, class: "btn btn-primary"
     = link_to t(".new_metric"), new_metric_path, class: "btn btn-secondary"
 
+- if @memories.any?
+  -# Collapsed by default (no `open` attr) so private journal entries stay hidden
+  -# until deliberately revealed. Native <details> needs no JS and is accessible.
+  %details.card.mb-6.group
+    %summary.card-pad.flex.cursor-pointer.list-none.items-center.justify-between.gap-3{ class: "[&::-webkit-details-marker]:hidden" }
+      %span
+        %span.font-semibold.text-gray-900.dark:text-white= t(".memories", count: @memories.size)
+        %span.ml-2.text-sm.text-gray-500.dark:text-gray-400= t(".memories_hint")
+      %span.text-gray-400.transition-transform.group-open:rotate-90 ▸
+    .space-y-3.border-t.border-gray-200.p-4.dark:border-gray-800
+      - @memories.each do |memory|
+        .rounded-lg.border.border-gray-200.p-4.dark:border-gray-800{ data: { controller: "local-time" } }
+          .mb-2.flex.items-center.justify-between.gap-2
+            = link_to memory.metric.name, metric_path(memory.metric), class: "font-semibold text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400"
+            %span.badge= memory_label(memory.interval_months)
+          %time.mb-2.block.text-xs.text-gray-500.dark:text-gray-400{ data: { local_time_target: "time", date_only: true }, datetime: memory.data_point.recorded_at.iso8601 }= memory.data_point.recorded_at.iso8601
+          = metric_value_display(memory.metric, memory.data_point)
+
 - if @metrics.any?
   %ul.space-y-3{ data: { controller: "reorder" } }
     - @metrics.each do |metric|

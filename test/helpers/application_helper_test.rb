@@ -65,6 +65,14 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_match 'value="hello"', html
   end
 
+  test "memory_label reads in months under a year and years at year boundaries" do
+    assert_equal "1 month ago", memory_label(1)
+    assert_equal "3 months ago", memory_label(3)
+    assert_equal "1 year ago", memory_label(12)
+    assert_equal "2 years ago", memory_label(24)
+    assert_equal "4 years ago", memory_label(48)
+  end
+
   test "render_markdown converts markdown and strips raw html" do
     html = render_markdown("# Heading\n\n**bold** and *italic*\n\n<script>alert(1)</script>")
     assert_match %r{<h1[^>]*>Heading</h1>}, html

@@ -103,4 +103,26 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_no_match "Chartkick", response.body
   end
+
+  test "shows a memories accordion for a text_block entry on its anniversary" do
+    user = confirmed_user(email: "memories@m.test")
+    journal = user.metrics.create!(name: "Diary", data_type: "text_block")
+    journal.data_points.create!(recorded_at: 1.year.ago.change(hour: 9), value: "**A year back**")
+    sign_in user
+    get root_path
+    assert_response :success
+    assert_select "details summary", text: /Memory \(1\)/
+    assert_select "details .badge", text: "1 year ago"
+    assert_select "details .markdown-body strong", text: "A year back"
+  end
+
+  test "hides the memories accordion when no entry has an anniversary today" do
+    user = confirmed_user(email: "nomemories@m.test")
+    journal = user.metrics.create!(name: "Diary", data_type: "text_block")
+    journal.data_points.create!(recorded_at: 5.days.ago, value: "recent")
+    sign_in user
+    get root_path
+    assert_response :success
+    assert_select "details summary", count: 0
+  end
 end

@@ -5,6 +5,14 @@ en:
     "yes": "Yes"
     "no": "No"
 
+  memories:
+    months_ago:
+      one: "%{count} month ago"
+      other: "%{count} months ago"
+    years_ago:
+      one: "%{count} year ago"
+      other: "%{count} years ago"
+
   metrics:
     types:
       decimal: "Decimal"
@@ -67,6 +75,11 @@ en:
       export_csv: "Export CSV"
       api_token: "API token"
       drag_to_reorder: "Drag to reorder"
+      memories:
+        one: "Memory (%{count})"
+        other: "Memories (%{count})"
+      memories_hint: "Journal entries from this day in the past"
+      memory_recorded: "Recorded"
 
   data_points:
     timeline:
