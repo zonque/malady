@@ -17,6 +17,13 @@ class QuickEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_select "select[name=?]", "values[#{@mood.id}]"
   end
 
+  test "new shows each metric's note" do
+    @weight.update!(note: "Morning, before food")
+    get new_quick_entry_path
+    assert_response :success
+    assert_select ".metric-note", text: "Morning, before food"
+  end
+
   test "create stores only filled metrics with the shared timestamp" do
     assert_difference -> { DataPoint.count }, 1 do
       post quick_entry_path, params: { recorded_at: "2026-03-01T08:00",

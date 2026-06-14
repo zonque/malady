@@ -9,6 +9,8 @@
         = label_tag "values_#{metric.id}", class: "form-label" do
           = metric_icon_tag(metric, class: "mr-1 text-gray-500 dark:text-gray-400")
           = "#{metric.name}#{" (#{metric.unit})" if metric.unit.present?}"
+        - if metric.note.present?
+          %p.metric-note.mb-1.text-xs.italic.text-gray-500.dark:text-gray-400= metric.note
         = metric_value_input(metric, name: "values[#{metric.id}]", value: @values[metric.id], id: "values_#{metric.id}")
         - if @drafts[metric.id]&.errors&.any?
           %p.mt-1.text-sm.text-red-600= @drafts[metric.id].errors.full_messages.to_sentence
