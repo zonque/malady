@@ -28,6 +28,9 @@ class Metric < ApplicationRecord
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: { scope: :user_id }
+  # A Bootstrap Icons name (kebab-case). Constrained so it can't break out of the
+  # `class="bi bi-#{icon}"` attribute it's rendered into. Optional.
+  validates :icon, format: { with: /\A[a-z0-9]+(-[a-z0-9]+)*\z/ }, allow_blank: true
   validate :enum_options_present_for_enumeration
 
   scope :ordered, -> { order(:position, :id) }

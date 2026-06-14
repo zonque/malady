@@ -47,4 +47,19 @@ class MetricTest < ActiveSupport::TestCase
     assert_not m.numeric?
     assert_not m.chartable?
   end
+
+  test "icon is optional and accepts kebab-case bootstrap icon names" do
+    assert @user.metrics.build(name: "A", data_type: "text", icon: nil).valid?
+    assert @user.metrics.build(name: "B", data_type: "text", icon: "").valid?
+    assert @user.metrics.build(name: "C", data_type: "text", icon: "heart-fill").valid?
+    assert @user.metrics.build(name: "D", data_type: "text", icon: "0-circle").valid?
+  end
+
+  test "icon rejects values that could break out of the class attribute" do
+    %w[heart\ fill "onerror Heart-Fill -leading trailing- heart_fill].each do |bad|
+      m = @user.metrics.build(name: "X", data_type: "text", icon: bad)
+      assert_not m.valid?, "expected #{bad.inspect} to be invalid"
+      assert m.errors[:icon].any?
+    end
+  end
 end

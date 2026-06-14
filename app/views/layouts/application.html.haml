@@ -16,6 +16,8 @@
     %link{ rel: "apple-touch-icon", href: "/icon.svg" }
 
     = stylesheet_link_tag "tailwind", "data-turbo-track": "reload"
+    -# Bootstrap Icons webfont (vendored under public/) for per-metric icons.
+    %link{ rel: "stylesheet", href: "/bootstrap-icons/bootstrap-icons.css" }
     = javascript_importmap_tags
 
   - body_data = { controller: "dark-mode" }

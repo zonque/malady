@@ -15,6 +15,17 @@
   %div
     = f.label :unit, class: "form-label"
     = f.text_field :unit, class: "form-input", placeholder: t(".unit_placeholder")
+  %div{ data: { controller: "icon-picker" } }
+    = f.label :icon, t(".icon_label"), class: "form-label"
+    = f.hidden_field :icon, data: { icon_picker_target: "input" }
+    .mb-2.flex.items-center.gap-3
+      %i{ class: (metric.icon.present? ? "bi bi-#{metric.icon} text-2xl" : "bi bi-question-square text-2xl text-gray-300 dark:text-gray-600"), data: { icon_picker_target: "preview" }, "aria-hidden": "true" }
+      = text_field_tag :icon_search, nil, placeholder: t(".icon_search_placeholder"), class: "form-input flex-1", autocomplete: "off", data: { icon_picker_target: "search", action: "input->icon-picker#filter" }
+      %button.btn.btn-secondary.btn-sm{ type: "button", data: { action: "icon-picker#clear" } }= t(".icon_clear")
+    .grid.max-h-56.grid-cols-8.gap-2.overflow-y-auto.rounded-lg.border.border-gray-200.p-2.dark:border-gray-800{ data: { icon_picker_target: "grid", action: "scroll->icon-picker#scroll" } }
+    %p.form-hint.mt-1
+      = t(".icon_count_label")
+      %span.tabular-nums{ data: { icon_picker_target: "count" } }
   %div
     = f.label :note, class: "form-label"
     = f.text_field :note, class: "form-input", placeholder: t(".note_placeholder")

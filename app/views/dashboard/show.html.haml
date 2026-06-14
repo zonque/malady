@@ -30,6 +30,7 @@
         = link_to metric_path(metric), class: "block min-w-0 flex-1" do
           .flex.items-center.justify-between.gap-3
             .min-w-0
+              = metric_icon_tag(metric, class: "mr-1 text-gray-500 dark:text-gray-400")
               %span.font-semibold.text-gray-900.dark:text-white= metric.name
               - if metric.unit.present?
                 %span.ml-2.text-sm.text-gray-500.dark:text-gray-400= metric.unit

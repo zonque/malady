@@ -65,6 +65,19 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_match 'value="hello"', html
   end
 
+  test "metric_icon_tag renders a bootstrap icon when set and nothing when blank" do
+    assert_nil metric_icon_tag(metric("text"))
+    assert_nil metric_icon_tag(Metric.new(data_type: "text", icon: ""))
+    html = metric_icon_tag(Metric.new(data_type: "text", icon: "heart-fill"))
+    assert_match %r{<i[^>]*class="[^"]*bi bi-heart-fill}, html
+    assert_match 'aria-hidden="true"', html
+  end
+
+  test "metric_icon_tag merges extra classes" do
+    html = metric_icon_tag(Metric.new(data_type: "text", icon: "star"), class: "text-lg")
+    assert_match %r{<i[^>]*class="[^"]*bi bi-star[^"]*text-lg}, html
+  end
+
   test "memory_label reads in months under a year and years at year boundaries" do
     assert_equal "1 month ago", memory_label(1)
     assert_equal "3 months ago", memory_label(3)

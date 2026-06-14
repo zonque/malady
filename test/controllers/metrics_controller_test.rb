@@ -36,6 +36,32 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name=?]", "metric[note]"
   end
 
+  test "create stores the metric icon" do
+    post metrics_path, params: { metric: { name: "Weight", data_type: "decimal", icon: "heart-pulse" } }
+    assert_equal "heart-pulse", @user.metrics.order(:created_at).last.icon
+  end
+
+  test "update changes the metric icon" do
+    m = @user.metrics.create!(name: "Weight", data_type: "decimal", icon: "heart")
+    patch metric_path(m), params: { metric: { icon: "star-fill" } }
+    assert_equal "star-fill", m.reload.icon
+  end
+
+  test "metric form renders the icon picker wired to the hidden field" do
+    get new_metric_path
+    assert_response :success
+    assert_select "[data-controller~=?]", "icon-picker"
+    assert_select "input[type=hidden][name=?][data-icon-picker-target=?]", "metric[icon]", "input"
+    assert_select "[data-icon-picker-target=?]", "grid"
+  end
+
+  test "metric show renders the icon next to the title" do
+    m = @user.metrics.create!(name: "Heart Rate", data_type: "integer", icon: "heart-pulse")
+    get metric_path(m)
+    assert_response :success
+    assert_select "h1.page-title i.bi.bi-heart-pulse"
+  end
+
   test "metric show displays the note above the entry form" do
     m = @user.metrics.create!(name: "Weight", data_type: "decimal", note: "Log fasting only")
     get metric_path(m)

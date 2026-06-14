@@ -50,6 +50,16 @@ module ApplicationHelper
     end
   end
 
+  # Renders a metric's Bootstrap icon as an <i class="bi bi-NAME">, or nil when no
+  # icon is set. The icon name is format-validated (kebab-case) on the model, so it
+  # is safe to interpolate into the class attribute.
+  def metric_icon_tag(metric, **options)
+    return if metric.icon.blank?
+
+    classes = [ "bi", "bi-#{metric.icon}", options.delete(:class) ].compact.join(" ")
+    content_tag :i, "", { class: classes, "aria-hidden": "true" }.merge(options)
+  end
+
   # Human label for a memory's anniversary interval, e.g. "3 months ago" or
   # "2 years ago". Whole years (multiples of 12) read as years.
   def memory_label(months)

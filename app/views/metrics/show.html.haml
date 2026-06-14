@@ -1,7 +1,9 @@
 = link_to t(".back"), root_path, class: "link text-sm"
 .mb-6.flex.items-center.justify-between.gap-3
   %div
-    %h1.page-title= @metric.name
+    %h1.page-title
+      = metric_icon_tag(@metric, class: "mr-1 text-gray-500 dark:text-gray-400")
+      = @metric.name
     %span.badge.mt-1= t("metrics.types.#{@metric.data_type}")
     - if @metric.unit.present?
       %span.ml-1.text-sm.text-gray-500= @metric.unit

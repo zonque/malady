@@ -43,6 +43,10 @@ en:
       unit_placeholder: "e.g. kg, bpm, °C"
       note_placeholder: "Optional note about this metric"
       ignore_time_label: "Ignore time (record date only)"
+      icon_label: "Icon"
+      icon_search_placeholder: "Search icons…"
+      icon_clear: "Clear"
+      icon_count_label: "Loaded: "
     enum_options:
       enum_options_label: "Choices"
       add_choice: "+ Add choice"
