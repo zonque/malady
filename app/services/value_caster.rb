@@ -19,6 +19,7 @@ class ValueCaster
     when "boolean"     then boolean(raw)
     when "enumeration" then enumeration(raw)
     when "text"        then text(raw)
+    when "text_block"  then text(raw)
     else raise Error, "unknown data_type #{@metric.data_type.inspect}"
     end
   end

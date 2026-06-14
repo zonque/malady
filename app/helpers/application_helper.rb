@@ -15,6 +15,10 @@ module ApplicationHelper
   # Renders the value input appropriate to a metric's data_type.
   # `name` is the form field name, e.g. "data_point[value]" or "values[42]".
   def metric_value_input(metric, name:, value: nil, id: nil)
+    # Default to the name-derived id so callers that omit `id` still get a stable,
+    # addressable element. Passing `id: nil` straight through to the *_tag helpers
+    # would suppress the auto-generated id entirely.
+    id ||= sanitize_to_id(name)
     base = { class: "form-input", id: id }
     case metric.data_type
     when "enumeration"
@@ -27,8 +31,37 @@ module ApplicationHelper
       number_field_tag name, value, base.merge(step: 1)
     when "decimal", "percentage"
       number_field_tag name, value, base.merge(step: "any")
+    when "text_block"
+      # Resizable (native handle) textarea for longer entries such as a journal.
+      text_area_tag name, value, base.merge(rows: 8, style: "resize: vertical")
     else # text
       text_field_tag name, value, base
     end
   end
+
+  # The display markup for a logged value. For text_block, the stored Markdown is
+  # rendered to sanitized HTML in a prose block; every other type shows its plain
+  # value_text inline (value_text is the canonical display string — see _data_point).
+  def metric_value_display(metric, data_point)
+    if metric.text_block?
+      content_tag :div, render_markdown(data_point.value_text), class: "markdown-body"
+    else
+      content_tag :span, data_point.value_text, class: "font-mono text-gray-900 dark:text-gray-100"
+    end
+  end
+
+  # Renders a Markdown string to sanitized HTML. Raw/inline HTML is stripped by
+  # Redcarpet (filter_html) and again by Rails' sanitize as a defense-in-depth layer.
+  def render_markdown(text)
+    sanitize(MARKDOWN.render(text.to_s))
+  end
+
+  MARKDOWN = Redcarpet::Markdown.new(
+    Redcarpet::Render::HTML.new(filter_html: true, hard_wrap: true),
+    autolink: true,
+    tables: true,
+    fenced_code_blocks: true,
+    strikethrough: true,
+    no_intra_emphasis: true
+  )
 end

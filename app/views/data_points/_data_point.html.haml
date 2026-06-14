@@ -1,8 +1,9 @@
 %li.card.flex.items-center.justify-between.gap-3.px-4.py-3{ id: dom_id(data_point), data: { controller: "local-time" } }
   .min-w-0
     %time.block.text-xs.text-gray-500.dark:text-gray-400{ data: { local_time_target: "time" }.merge(metric.ignore_time? ? { date_only: true } : {}), datetime: data_point.recorded_at.iso8601 }= data_point.recorded_at.iso8601
+    -# metric_value_display renders Markdown for text_block; plain value_text otherwise.
     -# value_text is the canonical display string; data_point.value would render a BigDecimal as "0.725e2".
-    %span.font-mono.text-gray-900.dark:text-gray-100= data_point.value_text
+    = metric_value_display(metric, data_point)
     - if data_point.note.present?
       %span.ml-2.text-sm.text-gray-500= data_point.note
   = button_to "✕", metric_data_point_path(metric, data_point), method: :delete, form: { data: { turbo_stream: true } }, class: "btn btn-ghost btn-sm text-red-600"

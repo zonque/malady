@@ -44,6 +44,7 @@ gem "image_processing", "~> 2.0"
 
 gem "chartkick"
 gem "haml-rails"
+gem "redcarpet"
 gem "devise"
 gem "csv"
 gem "exception_notification"

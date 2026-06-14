@@ -68,4 +68,28 @@
 
   /* Page heading */
   .page-title { @apply text-2xl font-bold tracking-tight text-gray-900 dark:text-white; }
+
+  /* Rendered Markdown (text_block metric values). Lightweight prose styling so
+     headings, lists, code, links and quotes read well in light and dark mode. */
+  .markdown-body { @apply text-gray-900 dark:text-gray-100 break-words; }
+  .markdown-body > :first-child { @apply mt-0; }
+  .markdown-body > :last-child  { @apply mb-0; }
+  .markdown-body h1 { @apply mt-4 mb-2 text-xl font-bold; }
+  .markdown-body h2 { @apply mt-4 mb-2 text-lg font-semibold; }
+  .markdown-body h3 { @apply mt-3 mb-1 text-base font-semibold; }
+  .markdown-body p  { @apply my-2 leading-relaxed; }
+  .markdown-body ul { @apply my-2 list-disc pl-6; }
+  .markdown-body ol { @apply my-2 list-decimal pl-6; }
+  .markdown-body li { @apply my-0.5; }
+  .markdown-body a  { @apply text-indigo-600 hover:underline dark:text-indigo-400; }
+  .markdown-body blockquote { @apply my-2 border-l-4 border-gray-200 pl-3 italic text-gray-600
+                                     dark:border-gray-700 dark:text-gray-400; }
+  .markdown-body code { @apply rounded bg-gray-100 px-1 py-0.5 font-mono text-sm
+                               dark:bg-gray-800; }
+  .markdown-body pre  { @apply my-2 overflow-x-auto rounded-lg bg-gray-100 p-3 text-sm
+                               dark:bg-gray-800; }
+  .markdown-body pre code { @apply bg-transparent p-0; }
+  .markdown-body table { @apply my-2 w-full border-collapse text-sm; }
+  .markdown-body th, .markdown-body td { @apply border border-gray-200 px-2 py-1 text-left
+                                                dark:border-gray-700; }
 }

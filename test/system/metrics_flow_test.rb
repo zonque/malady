@@ -45,4 +45,33 @@ class MetricsFlowTest < ApplicationSystemTestCase
     JS
     assert_text "72.5"
   end
+
+  test "create a text_block metric and log a markdown entry" do
+    visit new_user_session_path
+    fill_in "Email", with: @user.email
+    fill_in "Password", with: "password123"
+    click_button "Log in"
+    assert_no_text "You need to sign in"
+
+    visit new_metric_path
+    fill_in "Name", with: "Journal"
+    select "Text block", from: "Data type"
+    execute_script("document.querySelector('form').submit()")
+
+    assert_text "Metric created."
+    assert_text "Journal"
+    # text_block is not chartable: no chart canvas should be present.
+    assert_no_selector "canvas"
+    # The value input is a textarea, not a single-line field.
+    assert_selector "textarea#data_point_value"
+
+    execute_script(<<~JS)
+      document.getElementById('data_point_value').value = '# Day one\\n\\nFelt **great** today.';
+      document.querySelector('form[action*="data_points"]').submit();
+    JS
+
+    # Markdown is rendered to HTML in the timeline.
+    assert_selector ".markdown-body h1", text: "Day one"
+    assert_selector ".markdown-body strong", text: "great"
+  end
 end

@@ -7,7 +7,7 @@ class ApplicationHelperTest < ActionView::TestCase
 
   test "metric_chartable? only for numeric and boolean" do
     %w[decimal integer percentage boolean].each { |t| assert metric_chartable?(Metric.new(data_type: t)) }
-    %w[enumeration text].each { |t| assert_not metric_chartable?(Metric.new(data_type: t)) }
+    %w[enumeration text text_block].each { |t| assert_not metric_chartable?(Metric.new(data_type: t)) }
   end
 
   test "metric_chart_data builds time/value pairs for numeric metrics" do
@@ -53,8 +53,37 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_match %r{<input[^>]*type="text"}, metric_value_input(metric("text"), name: "x")
   end
 
+  test "text_block renders a resizable textarea prefilled with the value" do
+    html = metric_value_input(metric("text_block"), name: "x", value: "line one\nline two")
+    assert_match %r{<textarea}, html
+    assert_match "resize", html
+    assert_match "line one\nline two", html
+  end
+
   test "prefills the current value" do
     html = metric_value_input(metric("text"), name: "x", value: "hello")
     assert_match 'value="hello"', html
+  end
+
+  test "render_markdown converts markdown and strips raw html" do
+    html = render_markdown("# Heading\n\n**bold** and *italic*\n\n<script>alert(1)</script>")
+    assert_match %r{<h1[^>]*>Heading</h1>}, html
+    assert_match "<strong>bold</strong>", html
+    # The <script> tag is stripped; any residual text is harmless and not executable.
+    assert_not_includes html, "<script"
+  end
+
+  test "metric_value_display renders markdown for text_block and plain text otherwise" do
+    user = User.create!(email: "md@h.t", password: "password123")
+
+    tb = user.metrics.create!(name: "Journal", data_type: "text_block")
+    tb_dp = tb.data_points.create!(recorded_at: Time.utc(2026, 1, 1), value: "**hi**")
+    assert_match "<strong>hi</strong>", metric_value_display(tb, tb_dp)
+
+    txt = user.metrics.create!(name: "Note", data_type: "text")
+    txt_dp = txt.data_points.create!(recorded_at: Time.utc(2026, 1, 1), value: "**hi**")
+    display = metric_value_display(txt, txt_dp)
+    assert_not_includes display, "<strong>"
+    assert_match "**hi**", display
   end
 end

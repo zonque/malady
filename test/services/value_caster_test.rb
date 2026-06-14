@@ -38,6 +38,12 @@ class ValueCasterTest < ActiveSupport::TestCase
     assert_raises(ValueCaster::Error) { cast("text", "  ") }
   end
 
+  test "text_block accepts multiline strings and rejects blank" do
+    multiline = "# Title\n\nFirst line\nSecond line"
+    assert_equal multiline, cast("text_block", multiline)[:value_text]
+    assert_raises(ValueCaster::Error) { cast("text_block", "  ") }
+  end
+
   test "rejects non-finite numbers" do
     assert_raises(ValueCaster::Error) { cast("decimal", "Infinity") }
     assert_raises(ValueCaster::Error) { cast("decimal", "-Infinity") }

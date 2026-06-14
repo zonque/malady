@@ -1,5 +1,5 @@
 class Metric < ApplicationRecord
-  DATA_TYPES = %w[decimal integer percentage boolean enumeration text].freeze
+  DATA_TYPES = %w[decimal integer percentage boolean enumeration text text_block].freeze
   NUMERIC_TYPES = %w[decimal integer percentage].freeze
 
   # Convenience presets selectable on the new-metric form. Each expands into a

@@ -43,8 +43,8 @@
                 %ul.divide-y.divide-gray-100.dark:divide-gray-800
                   - entry[:points].each do |dp|
                     %li.flex.items-center.justify-between.gap-2.py-1.text-sm
-                      %span.text-gray-500.dark:text-gray-400= overview_point_time(dp.recorded_at, @period, current_user.time_zone, ignore_time: entry[:metric].ignore_time?)
-                      %span.font-mono.text-gray-900.dark:text-gray-100= dp.value_text
+                      %span.shrink-0.text-gray-500.dark:text-gray-400= overview_point_time(dp.recorded_at, @period, current_user.time_zone, ignore_time: entry[:metric].ignore_time?)
+                      = metric_value_display(entry[:metric], dp)
     - if @report.total_pages > 1
       %nav.mt-8.flex.items-center.justify-between.gap-2
         - if @report.page > 1

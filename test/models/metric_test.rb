@@ -38,6 +38,13 @@ class MetricTest < ActiveSupport::TestCase
 
   test "chartable? for numeric and boolean only" do
     %w[decimal integer percentage boolean].each { |t| assert @user.metrics.build(data_type: t).chartable? }
-    %w[enumeration text].each { |t| assert_not @user.metrics.build(data_type: t).chartable? }
+    %w[enumeration text text_block].each { |t| assert_not @user.metrics.build(data_type: t).chartable? }
+  end
+
+  test "text_block is a valid, non-numeric, non-chartable type" do
+    m = @user.metrics.create!(name: "Journal", data_type: "text_block")
+    assert m.text_block?
+    assert_not m.numeric?
+    assert_not m.chartable?
   end
 end
