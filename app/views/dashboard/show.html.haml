@@ -7,18 +7,21 @@
 - if @memories.any?
   -# Collapsed by default (no `open` attr) so private journal entries stay hidden
   -# until deliberately revealed. Native <details> needs no JS and is accessible.
-  %details.card.mb-6.group
-    %summary.card-pad.flex.cursor-pointer.list-none.items-center.justify-between.gap-3{ class: "[&::-webkit-details-marker]:hidden" }
-      %span
-        %span.font-semibold.text-gray-900.dark:text-white= t(".memories", count: @memories.size)
-        %span.ml-2.text-sm.text-gray-500.dark:text-gray-400= t(".memories_hint")
-      %span.text-gray-400.transition-transform.group-open:rotate-90 ▸
-    .space-y-3.border-t.border-gray-200.p-4.dark:border-gray-800
+  -# A warm amber surface sets memories apart from the white metric cards below.
+  %details.mb-6.group{ class: "overflow-hidden rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10" }
+    %summary.card-pad.flex.cursor-pointer.items-center.justify-between.gap-3{ class: "list-none [&::-webkit-details-marker]:hidden" }
+      %span.flex.items-center.gap-2
+        %i.bi.bi-clock-history.text-lg.text-amber-500{ "aria-hidden": "true" }
+        %span
+          %span.font-semibold.text-amber-900.dark:text-amber-100= t(".memories", count: @memories.size)
+          %span.ml-2.text-sm.text-amber-700.dark:text-amber-200= t(".memories_hint")
+      %span.text-amber-400.transition-transform.group-open:rotate-90 ▸
+    .space-y-3.border-t.border-amber-200.p-4{ class: "dark:border-amber-500/30" }
       - @memories.each do |memory|
-        .rounded-lg.border.border-gray-200.p-4.dark:border-gray-800{ data: { controller: "local-time" } }
+        .rounded-lg.border.bg-white.p-4.shadow-sm{ class: "border-amber-200 dark:border-amber-500/20 dark:bg-gray-900", data: { controller: "local-time" } }
           .mb-2.flex.items-center.justify-between.gap-2
-            = link_to memory.metric.name, metric_path(memory.metric), class: "font-semibold text-gray-900 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400"
-            %span.badge= memory_label(memory.interval_months)
+            = link_to memory.metric.name, metric_path(memory.metric), class: "font-semibold text-gray-900 hover:text-amber-700 dark:text-white dark:hover:text-amber-300"
+            %span.badge{ class: "bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-200" }= memory_label(memory.interval_months)
           %time.mb-2.block.text-xs.text-gray-500.dark:text-gray-400{ data: { local_time_target: "time", date_only: true }, datetime: memory.data_point.recorded_at.iso8601 }= memory.data_point.recorded_at.iso8601
           = metric_value_display(memory.metric, memory.data_point)
 
