@@ -50,3 +50,7 @@
 deploy.sh
 run.sh
 
+# Daylio exports / backups (personal data — never commit)
+/*.daylio
+daylio_export_*.csv
+

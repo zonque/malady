@@ -81,4 +81,55 @@ class DataPointsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert foreign_dp.reload.persisted?
   end
+
+  test "each timeline row links to editing the reading" do
+    dp = @metric.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "72")
+    get metric_path(@metric)
+    assert_response :success
+    assert_select "a[href=?]", edit_metric_data_point_path(@metric, dp)
+  end
+
+  test "the delete control requires confirmation" do
+    dp = @metric.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "72")
+    get metric_path(@metric)
+    assert_response :success
+    assert_select "form[action=?][data-turbo-confirm]", metric_data_point_path(@metric, dp)
+  end
+
+  test "edit renders the shared form prefilled with the reading's value" do
+    dp = @metric.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "72.5")
+    get edit_metric_data_point_path(@metric, dp)
+    assert_response :success
+    assert_select "form[action=?]", metric_data_point_path(@metric, dp)
+    assert_select "input[name=?][value=?]", "data_point[value]", "72.5"
+  end
+
+  test "edit of a text_block reading uses a textarea prefilled with the markdown" do
+    journal = @user.metrics.create!(name: "Journal", data_type: "text_block")
+    dp = journal.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "# Title\n\nbody")
+    get edit_metric_data_point_path(journal, dp)
+    assert_response :success
+    assert_select "textarea[name=?]", "data_point[value]" do |els|
+      assert_match "# Title", els.first.text
+    end
+  end
+
+  test "update changes the reading and redirects to the metric" do
+    dp = @metric.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "72")
+    patch metric_data_point_path(@metric, dp), params: { data_point: { value: "73.4", note: "after lunch" } }
+    assert_redirected_to metric_path(@metric)
+    dp.reload
+    assert_equal 73.4, dp.value_decimal
+    assert_equal "after lunch", dp.note
+  end
+
+  test "update with an invalid value re-renders the edit form" do
+    dp = @metric.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "72")
+    patch metric_data_point_path(@metric, dp), params: { data_point: { value: "abc" } }
+    assert_response :unprocessable_entity
+    assert_equal 72, dp.reload.value_decimal
+  end
+
+  # Edit/update are scoped through the same `current_user.metrics.find` as create
+  # and destroy (covered above), so cross-user access yields 404 the same way.
 end

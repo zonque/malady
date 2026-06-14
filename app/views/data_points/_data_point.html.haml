@@ -6,4 +6,6 @@
     = metric_value_display(metric, data_point)
     - if data_point.note.present?
       %span.ml-2.text-sm.text-gray-500= data_point.note
-  = button_to "✕", metric_data_point_path(metric, data_point), method: :delete, form: { data: { turbo_stream: true } }, class: "btn btn-ghost btn-sm text-red-600"
+  .flex.shrink-0.items-center.gap-1
+    = link_to t(".edit"), edit_metric_data_point_path(metric, data_point), class: "btn btn-ghost btn-sm"
+    = button_to "✕", metric_data_point_path(metric, data_point), method: :delete, form: { data: { turbo_stream: true, turbo_confirm: t(".delete_confirm") } }, class: "btn btn-ghost btn-sm text-red-600"

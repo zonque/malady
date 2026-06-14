@@ -91,9 +91,13 @@ en:
       newer: "← Newer"
       older: "Older →"
       page_of: "Page %{page} of %{total}"
+    data_point:
+      edit: "Edit"
+      delete_confirm: "Delete this reading? This can't be undone."
     form:
       note_placeholder: "note (optional)"
       add_reading: "Add reading"
+      save: "Save changes"
     edit:
       title: "Edit entry"
     update:
