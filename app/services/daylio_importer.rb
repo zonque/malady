@@ -162,16 +162,32 @@ class DaylioImporter
   end
 
   def find_or_create_metric(name, data_type:, enum_options: [])
-    if (existing = @user.metrics.find_by(name: name))
-      @summary.metrics_reused += 1
-      log "reuse metric #{name.inspect} (#{existing.data_type})"
-      return existing
+    existing = @user.metrics.find_by(name: name)
+
+    if existing.nil?
+      metric = @user.metrics.create!(name: name, data_type: data_type, enum_options: enum_options)
+      @summary.metrics_created += 1
+      log "create #{data_type} metric #{name.inspect}"
+      return metric
     end
 
-    metric = @user.metrics.create!(name: name, data_type: data_type, enum_options: enum_options)
-    @summary.metrics_created += 1
-    log "create #{data_type} metric #{name.inspect}"
-    metric
+    @summary.metrics_reused += 1
+
+    # A same-named metric of a different type would otherwise be reused as-is —
+    # e.g. a "Journal" that pre-exists as `text` would never become `text_block`,
+    # and so never appear under dashboard Memories. Convert it to the type the
+    # import needs. This is lossless: value_text is the source of truth and is
+    # preserved; numeric/boolean projections are recomputed for the new type.
+    if existing.data_type != data_type
+      from = existing.data_type
+      existing.update!(enum_options: enum_options) if enum_options.any?
+      MetricTypeChanger.new(existing).apply!(data_type)
+      log "convert metric #{name.inspect} (#{from} → #{data_type})"
+      return existing.reload
+    end
+
+    log "reuse metric #{name.inspect} (#{data_type})"
+    existing
   end
 
   def merge_enum_options(metric, names)

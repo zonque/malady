@@ -93,6 +93,25 @@ class DaylioImporterTest < ActiveSupport::TestCase
     assert_equal "First line\nSecond line", text
   end
 
+  test "converts a pre-existing same-named metric to the type the import needs" do
+    # A "Journal" metric that already exists as plain text (e.g. created manually
+    # or by an older import) must end up as text_block, not be reused as-is —
+    # otherwise it never shows up under dashboard Memories.
+    existing = @user.metrics.create!(name: "Journal", data_type: "text")
+    existing.data_points.create!(recorded_at: Time.utc(2025, 1, 1, 9), value: "an older note")
+
+    import!(csv: <<~CSV)
+      full_date,date,weekday,time,mood,activities,note_title,note
+      2026-05-20,May 20,Wednesday,22:13,good,,,"A new note"
+    CSV
+
+    journal = @user.metrics.find_by(name: "Journal")
+    assert_equal "text_block", journal.data_type
+    # The pre-existing value is preserved through the conversion.
+    assert_includes journal.data_points.map(&:value_text), "an older note"
+    assert_includes journal.data_points.map(&:value_text), "A new note"
+  end
+
   test "dry run reports what would happen but persists nothing" do
     summary = import!(dry_run: true)
     assert_equal 0, @user.metrics.count
