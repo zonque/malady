@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+# Pre-commit hook — runs CI's fast checks locally so failures surface here
+# instead of in CI. Mirrors the static-analysis + unit-test steps from
+# config/ci.rb. The slow Chrome system tests are intentionally left out to keep
+# commits quick (CI still runs them).
+#
+# Enabled via `git config core.hooksPath .githooks` (bin/setup does this for you).
+# Bypass in a pinch with:  git commit --no-verify
+#
+set -uo pipefail
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+bold=$'\033[1m'; red=$'\033[31m'; green=$'\033[32m'; dim=$'\033[2m'; reset=$'\033[0m'
+failed=()
+
+check() {
+  local name="$1"; shift
+  printf '\n%s› %s%s %s(%s)%s\n' "$bold" "$name" "$reset" "$dim" "$*" "$reset"
+  if ! "$@"; then failed+=("$name"); fi
+}
+
+check "Style: RuboCop"      bin/rubocop -f github
+check "Security: Brakeman"  bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error
+check "Security: Gem audit" bin/bundler-audit
+check "Security: Importmap" bin/importmap audit
+check "Tests"               bin/rails test
+
+if ((${#failed[@]})); then
+  printf '\n%s✖ Pre-commit failed:%s %s\n' "$red" "$reset" "${failed[*]}"
+  printf 'Fix the issues (RuboCop autocorrect: %sbin/rubocop -a%s), or bypass with %sgit commit --no-verify%s.\n' \
+    "$bold" "$reset" "$bold" "$reset"
+  exit 1
+fi
+
+printf '\n%s✓ All pre-commit checks passed.%s\n' "$green" "$reset"

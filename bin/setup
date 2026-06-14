@@ -15,6 +15,9 @@ FileUtils.chdir APP_ROOT do
   puts "== Installing dependencies =="
   system("bundle check") || system!("bundle install")
 
+  puts "\n== Enabling git hooks (pre-commit) =="
+  system! "git config core.hooksPath .githooks"
+
   puts "\n== Building assets (Tailwind CSS) =="
   system! "bin/rails tailwindcss:build"
 

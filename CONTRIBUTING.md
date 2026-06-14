@@ -58,6 +58,16 @@ bin/brakeman            # static security analysis
 
 All of these should be green before you open a PR.
 
+A **pre-commit hook** runs the fast checks (RuboCop, Brakeman, gem/importmap
+audits, and the unit tests) so CI failures surface locally. It's enabled
+automatically by `bin/setup`; to enable it manually run:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Bypass it for a work-in-progress commit with `git commit --no-verify`.
+
 ## Commit messages
 
 Write clear, imperative-mood subjects ("Add CSV export", not "Added"/"Adds").

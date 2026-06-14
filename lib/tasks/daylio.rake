@@ -20,7 +20,7 @@ namespace :malady do
     parser.parse!(rest)
 
     if opts[:user].blank? || opts[:file].blank?
-      warn parser.to_s
+      warn parser
       exit 1
     end
 
