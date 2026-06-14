@@ -42,8 +42,9 @@
                     = t(".min_max_avg", min: overview_stat(entry[:min]), max: overview_stat(entry[:max]), avg: overview_stat(entry[:avg]))
                     - if entry[:metric].unit.present?
                       = entry[:metric].unit
+                -# entry[:points] stays ascending for the chart; show newest first.
                 %ul.divide-y.divide-gray-100.dark:divide-gray-800
-                  - entry[:points].each do |dp|
+                  - entry[:points].reverse_each do |dp|
                     %li.flex.items-center.justify-between.gap-2.py-1.text-sm
                       %span.shrink-0.text-gray-500.dark:text-gray-400= overview_point_time(dp.recorded_at, @period, current_user.time_zone, ignore_time: entry[:metric].ignore_time?)
                       = metric_value_display(entry[:metric], dp)

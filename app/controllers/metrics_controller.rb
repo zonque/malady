@@ -9,7 +9,7 @@ class MetricsController < ApplicationController
 
   def show
     @page = [ params[:page].to_i, 1 ].max
-    scope = @metric.data_points.order(recorded_at: :desc)
+    scope = @metric.data_points.order(recorded_at: :desc, id: :desc)
     @total_pages = [ (scope.count / DATA_POINTS_PER_PAGE.to_f).ceil, 1 ].max
     @data_points = scope.offset((@page - 1) * DATA_POINTS_PER_PAGE).limit(DATA_POINTS_PER_PAGE)
     @data_point = @metric.data_points.new(recorded_at: Time.current)

@@ -25,6 +25,16 @@ class OverviewsControllerTest < ActionDispatch::IntegrationTest
     assert_match "75", response.body   # avg of 70 and 80
   end
 
+  test "lists readings within a bucket newest-first" do
+    get overview_path(period: "day")
+    assert_response :success
+    values = []
+    assert_select "ul.divide-y li .font-mono" do |els|
+      values = els.map(&:text)
+    end
+    assert_equal [ "80", "70" ], values # 09:00 reading before 08:00 reading
+  end
+
   test "accepts week and month periods" do
     get overview_path(period: "week"); assert_response :success
     get overview_path(period: "month"); assert_response :success
