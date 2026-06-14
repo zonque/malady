@@ -13,7 +13,7 @@ class I18nCoverageTest < ActionDispatch::IntegrationTest
     sign_in @user
     paths = [ root_path, metrics_path, new_metric_path, metric_path(@metric),
              edit_metric_path(@metric), edit_metric_metric_type_path(@metric),
-             overview_path, new_quick_entry_path, api_token_path, admin_users_path ]
+             new_quick_entry_path, api_token_path, admin_users_path ]
     paths.each do |path|
       get path
       assert_response :success, "GET #{path} failed"

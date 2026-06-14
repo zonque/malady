@@ -47,7 +47,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resource :overview, only: [ :show ]
+  # The overview now lives at the metrics index (metrics#index). Keep /overview
+  # working for old links by redirecting it there.
+  get "overview", to: redirect("/metrics")
   resource :timezone, only: [ :update ]
 
   resource :quick_entry, only: [ :new, :create ]

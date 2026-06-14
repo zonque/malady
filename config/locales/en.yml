@@ -26,6 +26,18 @@ en:
       scale_0_5: "Scale (0–5)"
     index:
       new_metric: "New metric"
+      title: "Overview"
+      plot_lines: "Plot lines"
+      reading:
+        one: "%{count} reading"
+        other: "%{count} readings"
+      newer: "← Newer"
+      older: "Older →"
+      page_of: "Page %{page} of %{total}"
+      no_data: "No data yet."
+      min_max_avg: "min %{min} · max %{max} · avg %{avg}"
+      period_label:
+        week: "Week of %{date} · CW %{cw}"
     new:
       title: "New metric"
     edit:
@@ -123,21 +135,6 @@ en:
       ov_week_point: "%a %H:%M"
       ov_month_point: "%b %-d, %H:%M"
       ov_point_date: "%b %-d, %Y"
-
-  overviews:
-    show:
-      title: "Overview"
-      plot_lines: "Plot lines"
-      reading:
-        one: "%{count} reading"
-        other: "%{count} readings"
-      newer: "← Newer"
-      older: "Older →"
-      page_of: "Page %{page} of %{total}"
-      no_data: "No data yet."
-      min_max_avg: "min %{min} · max %{max} · avg %{avg}"
-      period_label:
-        week: "Week of %{date} · CW %{cw}"
 
   quick_entries:
     new:

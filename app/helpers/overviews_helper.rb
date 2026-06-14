@@ -17,7 +17,7 @@ module OverviewsHelper
 
   def overview_period_label(start, period)
     case period
-    when "week" then t("overviews.show.period_label.week", date: I18n.l(start, format: :ov_week_date), cw: start.to_date.cweek)
+    when "week" then t("metrics.index.period_label.week", date: I18n.l(start, format: :ov_week_date), cw: start.to_date.cweek)
     when "month" then I18n.l(start, format: :ov_month_header)
     else I18n.l(start, format: :ov_day_header)
     end
