@@ -26,6 +26,7 @@ optional dark mode. Licensed under **AGPL-3.0** (see [License](#license)).
 - [Admin account](#admin-account)
 - [Grafana integration](#grafana-integration)
 - [Data export](#data-export)
+- [Importing from Daylio](#importing-from-daylio)
 - [Production & Docker Compose](#production--docker-compose)
 - [License](#license)
 - [Contributing](#contributing)
@@ -76,11 +77,21 @@ in-app or through Grafana via a read-only JSON API.
 - **Multi-user accounts** (Devise): sign up, sign in, password reset, email
   confirmation, account lockout. Public sign-ups are gated by an env var.
 - **Per-user configurable metrics** with types: `decimal`, `integer`,
-  `percentage`, `boolean`, `enumeration`, `text`.
+  `percentage`, `boolean`, `enumeration`, `text`, and `text_block` — a Markdown
+  long-text / journal type, edited in a resizable textarea and rendered as Markdown.
 - **Type changes without data loss** — dry-run preview (how many convert / fail,
   with sample failures) then a lossless apply that preserves every original value.
 - **Per-metric logging** with live updates via Hotwire / Turbo Streams.
+- **Edit & delete readings** — edit any logged value through the shared entry
+  form (a textarea for `text_block`); deletions ask for confirmation first.
 - **Dashboard** with drag-to-reorder metrics.
+- **Per-metric icons** — pick a searchable Bootstrap icon, shown on the
+  dashboard, metric page, overview, and quick-entry form.
+- **Dashboard "Memories"** — resurfaces past journal entries on their
+  anniversaries (1 / 3 / 6 / 9 / 12 months, then yearly), tucked behind a
+  collapsed accordion for privacy.
+- **Import from Daylio** — bring activities, mood, and journal notes in from a
+  Daylio CSV export (see [Importing from Daylio](#importing-from-daylio)).
 - **Mobile-first UI** with optional **dark mode**.
 - **Data export** as **JSON** and **CSV** (long format).
 - **Grafana integration** through a token-authenticated, read-only JSON API.
@@ -96,6 +107,7 @@ in-app or through Grafana via a read-only JSON API.
 - Ruby on Rails 8, Ruby 4.0
 - Hotwire (Turbo + Stimulus), Haml templates
 - Tailwind CSS v4 (class-based dark mode)
+- Redcarpet (Markdown for `text_block`), Bootstrap Icons (vendored webfont)
 - Devise (authentication)
 - **SQLite** for development & test, **PostgreSQL** for production
 - Minitest (model, controller/integration, and system tests)
@@ -138,6 +150,16 @@ bin/dev                   # starts Rails AND the Tailwind CSS watcher (Procfile.
 - **Password:** `password123`
 
 Then visit <http://localhost:3000>.
+
+To fill an account with realistic **Faker** metrics and history:
+
+```bash
+bin/rails 'malady:demo_data' -- --email=demo@malady.test --days=60 --per-day=2 --create
+```
+
+`--create` makes a confirmed user if one doesn't exist, and `--days` / `--per-day`
+size the generated history (defaults: 60 days, 2 readings/day). The legacy
+positional form `bin/rails 'malady:demo_data[email]'` still works.
 
 ## Running the tests
 
@@ -262,6 +284,35 @@ Signed in, you can export all your data:
 - **CSV:** `GET /export/csv` — long format: `metric_slug, metric_name, recorded_at, value, unit, note`.
 
 All timestamps are UTC ISO-8601.
+
+## Importing from Daylio
+
+Migrating from [Daylio](https://daylio.net)? Export your entries as **CSV** from
+the Daylio app, then import the file for a user from the command line:
+
+```bash
+bin/rails 'malady:import_daylio' -- --user=EMAIL_OR_ID --file=path/to/export.csv --dry-run
+```
+
+- `--user` accepts an email or numeric id; `--file` is the Daylio CSV.
+- `--dry-run` parses and reports what *would* be created without writing
+  anything — drop it to perform the import.
+
+The importer maps Daylio's data onto Malady metrics:
+
+- **Activities → yes/no metrics** (a `true` reading per occurrence).
+- **Graded activities** named `good`/`medium`/`bad <thing>` are fuzzy-grouped
+  into a single **Choice** metric `<thing>` with `good`/`medium`/`bad` options
+  (e.g. `good sleep` / `medium sleep` → a `sleep` metric).
+- **Mood → a "Mood" Choice metric.**
+- **Notes → a "Journal" `text_block` metric**, with the note title as a Markdown
+  heading and Daylio's note HTML (`<br>`, lists, bold/italic…) translated to
+  Markdown.
+
+Imports are **idempotent**: metrics are reused by name and readings are
+de-duplicated by timestamp, so re-running won't create duplicates. The parser
+lives in `lib/daylio/` and has **no Rails dependencies** — it can be lifted out
+and used on its own.
 
 ## Production & Docker Compose
 
