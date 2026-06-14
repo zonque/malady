@@ -54,3 +54,8 @@ run.sh
 /*.daylio
 daylio_export_*.csv
 
+# Editor swap files and local scratch notes
+*.swp
+.*.swp
+/ideas
+
