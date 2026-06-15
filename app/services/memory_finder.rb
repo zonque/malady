@@ -7,7 +7,7 @@
 # month clamps to Feb 28/29).
 class MemoryFinder
   BASE_INTERVALS = [ 1, 3, 6, 9 ].freeze
-  WINDOW_DAYS = 2
+  WINDOW_DAYS = 1
 
   Memory = Struct.new(:data_point, :metric, :interval_months, keyword_init: true)
 

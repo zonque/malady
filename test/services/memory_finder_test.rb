@@ -36,10 +36,10 @@ class MemoryFinderTest < ActiveSupport::TestCase
     assert_equal [ 24, 36 ], intervals_for(two_yr, three_yr)
   end
 
-  test "matches within a +/- 2 day window but not beyond" do
-    plus_two  = note((@today << 1) + 2)
-    minus_two = note((@today << 1) - 2)
-    plus_three = note((@today << 1) + 3)
+  test "matches within a +/- 1 day window but not beyond" do
+    plus_two  = note((@today << 1) + 1)
+    minus_two = note((@today << 1) - 1)
+    plus_three = note((@today << 1) + 2)
     assert_equal [ 1, 1, nil ], intervals_for(plus_two, minus_two, plus_three)
   end
 
