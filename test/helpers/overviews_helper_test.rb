@@ -49,10 +49,18 @@ class OverviewsHelperTest < ActionView::TestCase
   end
 
   test "point time granularity per grouping" do
-    t = Time.utc(2026, 2, 2, 8, 5)
-    assert_equal "08:05", overview_point_time(t, "day", "UTC")
-    assert_match %r{\A[A-Z][a-z]{2} 08:05\z}, overview_point_time(t, "week", "UTC") # e.g. "Mon 08:05"
+    t = Time.utc(2026, 2, 2, 8, 5) # Monday
+    assert_equal "08:05", overview_point_time(t, "day", "UTC") # day header already names the weekday
+    assert_match %r{\AMon 08:05\z}, overview_point_time(t, "week", "UTC")
+    assert_match "Mon", overview_point_time(t, "month", "UTC") # weekday alongside the date
     assert_match "Feb", overview_point_time(t, "month", "UTC")
+  end
+
+  test "ignore_time points show the weekday with the date" do
+    t = Time.utc(2026, 2, 2, 8, 5) # Monday
+    label = overview_point_time(t, "day", "UTC", ignore_time: true)
+    assert_match "Mon", label
+    assert_match "Feb", label
   end
 
   test "stat formatting" do

@@ -16,7 +16,7 @@ export default class extends Controller {
       const d = new Date(ms)
       return period === "day"
         ? d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        : d.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+        : d.toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
     }
 
     const datasets = this.seriesValue.map((s, i) => {

@@ -133,8 +133,8 @@ en:
       ov_month_header: "%B %Y"
       ov_day_point: "%H:%M"
       ov_week_point: "%a %H:%M"
-      ov_month_point: "%b %-d, %H:%M"
-      ov_point_date: "%b %-d, %Y"
+      ov_month_point: "%a %b %-d, %H:%M"
+      ov_point_date: "%a, %b %-d, %Y"
 
   quick_entries:
     new:
