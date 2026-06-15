@@ -2,13 +2,16 @@ module ApplicationHelper
   def metric_chartable?(metric) = metric.chartable?
 
   # [[recorded_at, numeric_value], ...] for charting; nil for non-chartable types.
-  # Numeric types use value_decimal; boolean maps to 1/0.
+  # Numeric types use value_decimal; boolean maps to 1/0; enumerations map to the
+  # 0-based index of the chosen option.
   def metric_chart_data(metric)
     case metric.data_type
     when "decimal", "integer", "percentage"
       metric.data_points.order(:recorded_at).filter_map { |dp| [ dp.recorded_at, dp.value_decimal ] if dp.value_decimal }
     when "boolean"
       metric.data_points.order(:recorded_at).filter_map { |dp| [ dp.recorded_at, (dp.value_boolean ? 1 : 0) ] unless dp.value_boolean.nil? }
+    when "enumeration"
+      metric.data_points.order(:recorded_at).filter_map { |dp| [ dp.recorded_at, metric.enum_index(dp.value_text) ] if metric.enum_index(dp.value_text) }
     end
   end
 

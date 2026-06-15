@@ -36,9 +36,15 @@ class MetricTest < ActiveSupport::TestCase
     assert @user.metrics.build(data_type: "boolean").boolean?
   end
 
-  test "chartable? for numeric and boolean only" do
+  test "numeric and boolean metrics are chartable; free text is not" do
     %w[decimal integer percentage boolean].each { |t| assert @user.metrics.build(data_type: t).chartable? }
-    %w[enumeration text text_block].each { |t| assert_not @user.metrics.build(data_type: t).chartable? }
+    %w[text text_block].each { |t| assert_not @user.metrics.build(data_type: t).chartable? }
+  end
+
+  test "an enumeration with options is chartable (plotted by option index)" do
+    assert @user.metrics.build(data_type: "enumeration", enum_options: %w[0 1 2 3 4 5]).chartable?
+    assert @user.metrics.build(data_type: "enumeration", enum_options: %w[low high]).chartable?
+    assert_not @user.metrics.build(data_type: "enumeration", enum_options: []).chartable?
   end
 
   test "text_block is a valid, non-numeric, non-chartable type" do

@@ -30,6 +30,15 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_nil metric_chart_data(t)
   end
 
+  test "metric_chart_data charts an enumeration by its option index" do
+    user = User.create!(email: "ce@h.t", password: "password123")
+    m = user.metrics.create!(name: "Mood", data_type: "enumeration", enum_options: %w[low ok high])
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "low")
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 2, 8), value: "high")
+    # low -> index 0 (charted, not dropped), high -> index 2
+    assert_equal [ 0, 2 ], metric_chart_data(m).map(&:last)
+  end
+
   test "enumeration renders a select with its options" do
     html = metric_value_input(metric("enumeration", enum_options: [ "low", "high" ]), name: "data_point[value]")
     assert_match %r{<select[^>]*name="data_point\[value\]"}, html

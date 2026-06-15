@@ -36,7 +36,14 @@ class Metric < ApplicationRecord
   scope :ordered, -> { order(:position, :id) }
 
   def numeric? = NUMERIC_TYPES.include?(data_type)
-  def chartable? = numeric? || boolean?
+  # Enumerations chart by the index of the chosen option, so any enumeration with
+  # options is chartable. We store only the chosen label (value_text); the numeric
+  # position is derived on demand via #enum_index.
+  def chartable? = numeric? || boolean? || (enumeration? && enum_options.present?)
+
+  # The 0-based position of a stored enumeration value within enum_options, or nil
+  # if it isn't a current option. Used to plot enumerations on a numeric axis.
+  def enum_index(value_text) = enum_options.index(value_text)
 
   private
 

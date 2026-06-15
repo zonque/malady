@@ -4,22 +4,31 @@ class OverviewsHelperTest < ActionView::TestCase
   test "overview_chart_series builds series for chartable + selected metrics only" do
     user = User.create!(email: "ch@h.t", password: "password123")
     weight = user.metrics.create!(name: "Weight", data_type: "decimal")
-    mood = user.metrics.create!(name: "Mood", data_type: "enumeration", enum_options: [ "low", "high" ])
+    note = user.metrics.create!(name: "Note", data_type: "text")
     weight.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
     weight.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 9), value: "80")
-    mood.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "low")
+    note.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "hello")
 
     entries = OverviewReport.new(user.metrics.ordered, period: "day").buckets.first[:entries]
 
     # both selected, but only chartable (weight) produces a series
-    series = overview_chart_series(entries, [ weight.id, mood.id ])
+    series = overview_chart_series(entries, [ weight.id, note.id ])
     assert_equal [ "Weight" ], series.map { |s| s[:label] }
     assert_equal 2, series.first[:points].size
     assert_equal 70.0, series.first[:points].first[:y]   # actual value, not normalized
     assert_kind_of Integer, series.first[:points].first[:x]  # epoch ms
 
     # weight not selected → no series
-    assert_empty overview_chart_series(entries, [ mood.id ])
+    assert_empty overview_chart_series(entries, [ note.id ])
+  end
+
+  test "overview_chart_series charts an enumeration by option index" do
+    user = User.create!(email: "ch3@h.t", password: "password123")
+    mood = user.metrics.create!(name: "Mood", data_type: "enumeration", enum_options: %w[low ok high])
+    mood.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "ok")
+    mood.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 9), value: "high")
+    entries = OverviewReport.new(user.metrics.ordered, period: "day").buckets.first[:entries]
+    assert_equal [ 1.0, 2.0 ], overview_chart_series(entries, [ mood.id ]).first[:points].map { |p| p[:y] }
   end
 
   test "overview_chart_series maps boolean to 1/0" do
