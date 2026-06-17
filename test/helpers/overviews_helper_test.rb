@@ -63,6 +63,28 @@ class OverviewsHelperTest < ActionView::TestCase
     assert_match "Feb", label
   end
 
+  test "today and yesterday replace the date in point labels" do
+    now = Time.current.in_time_zone("UTC").change(hour: 8, min: 5)
+
+    assert_match "Today", overview_point_time(now, "month", "UTC")
+    assert_match "Yesterday", overview_point_time(now - 1.day, "month", "UTC")
+    assert_no_match(/Today|Yesterday/, overview_point_time(now - 5.days, "month", "UTC"))
+
+    # week view substitutes the weekday; ignore_time substitutes the whole date
+    assert_match "Today", overview_point_time(now, "week", "UTC")
+    assert_match "Yesterday", overview_point_time(now - 1.day, "day", "UTC", ignore_time: true)
+
+    # the time is still shown alongside the relative word
+    assert_match "08:05", overview_point_time(now, "month", "UTC")
+  end
+
+  test "day section header reads Today and Yesterday" do
+    today = Time.current.in_time_zone("UTC").beginning_of_day
+    assert_equal "Today", overview_period_label(today, "day")
+    assert_equal "Yesterday", overview_period_label(today - 1.day, "day")
+    assert_no_match(/Today|Yesterday/, overview_period_label(today - 5.days, "day"))
+  end
+
   test "stat formatting" do
     assert_equal "—", overview_stat(nil)
     assert_equal "71", overview_stat(71)

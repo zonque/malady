@@ -20,20 +20,21 @@ module OverviewsHelper
     case period
     when "week" then t("metrics.index.period_label.week", date: I18n.l(start, format: :ov_week_date), cw: start.to_date.cweek)
     when "month" then I18n.l(start, format: :ov_month_header)
-    else I18n.l(start, format: :ov_day_header)
+    else relative_day(start) || I18n.l(start, format: :ov_day_header)
     end
   end
 
   def overview_point_time(time, period, zone, ignore_time: false)
     local = time.in_time_zone(zone)
-    return I18n.l(local, format: :ov_point_date) if ignore_time
+    rel = relative_day(local)
+    return rel || I18n.l(local, format: :ov_point_date) if ignore_time
 
-    format = case period
-    when "week" then :ov_week_point
-    when "month" then :ov_month_point
-    else :ov_day_point
+    case period
+    # The day section already names the day in its header, so points show time only.
+    when "day"   then I18n.l(local, format: :ov_day_point)
+    when "week"  then relative_point(rel, local) || I18n.l(local, format: :ov_week_point)
+    else              relative_point(rel, local) || I18n.l(local, format: :ov_month_point)
     end
-    I18n.l(local, format: format)
   end
 
   def overview_stat(value)
@@ -42,6 +43,21 @@ module OverviewsHelper
   end
 
   private
+
+  # "Today"/"Yesterday" when the (zoned) date is within a day of now, else nil so
+  # callers fall back to an absolute format. `local` is a zoned time/date.
+  def relative_day(local)
+    case (local.to_date - Time.current.in_time_zone(local.time_zone).to_date).to_i
+    when 0  then t("dates.today")
+    when -1 then t("dates.yesterday")
+    end
+  end
+
+  # A point label that swaps the date portion for "Today"/"Yesterday" but keeps the
+  # time of day; nil when there's no relative word to substitute.
+  def relative_point(rel, local)
+    "#{rel} #{I18n.l(local, format: :ov_day_point)}" if rel
+  end
 
   # The numeric y-value for a data point: 1/0 for boolean, the option index for an
   # enumeration, otherwise the stored decimal.

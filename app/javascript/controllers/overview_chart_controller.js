@@ -4,7 +4,7 @@ import { Controller } from "@hotwired/stimulus"
 // global Chart.js (loaded via Chartkick's Chart.bundle). Each line is scaled to its
 // own min–max; tooltips show the real values.
 export default class extends Controller {
-  static values = { series: Array, period: String }
+  static values = { series: Array, period: String, today: String, yesterday: String }
 
   connect() {
     const Chart = window.Chart
@@ -14,9 +14,10 @@ export default class extends Controller {
     const period = this.periodValue
     const fmt = (ms) => {
       const d = new Date(ms)
-      return period === "day"
-        ? d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-        : d.toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
+      if (period === "day") return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      const rel = this.relativeDay(d)
+      const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      return rel ? `${rel} ${time}` : d.toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
     }
 
     const datasets = this.seriesValue.map((s, i) => {
@@ -57,6 +58,16 @@ export default class extends Controller {
         },
       },
     })
+  }
+
+  // The (i18n) word for today/yesterday when the date falls within a day of now in
+  // the browser's local zone, else null so the absolute date is shown.
+  relativeDay(date) {
+    const midnight = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
+    const days = Math.round((midnight(new Date()) - midnight(date)) / 86_400_000)
+    if (days === 0) return this.todayValue || null
+    if (days === 1) return this.yesterdayValue || null
+    return null
   }
 
   disconnect() {

@@ -126,6 +126,10 @@ en:
       unknown_type: "Unknown type."
       changed: "Type changed to %{type}."
 
+  dates:
+    today: "Today"
+    yesterday: "Yesterday"
+
   time:
     formats:
       ov_day_header: "%A, %b %-d, %Y"

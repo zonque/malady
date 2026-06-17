@@ -24,7 +24,7 @@
           - if series.any?
             .card.card-pad.mb-3
               .relative.h-64
-                %canvas{ data: { controller: "overview-chart", "overview-chart-series-value": series.to_json, "overview-chart-period-value": @period } }
+                %canvas{ data: { controller: "overview-chart", "overview-chart-series-value": series.to_json, "overview-chart-period-value": @period, "overview-chart-today-value": t("dates.today"), "overview-chart-yesterday-value": t("dates.yesterday") } }
           .space-y-3
             - bucket[:entries].each do |entry|
               .card.card-pad

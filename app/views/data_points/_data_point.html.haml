@@ -1,4 +1,4 @@
-%li.card.flex.items-center.justify-between.gap-3.px-4.py-3{ id: dom_id(data_point), data: { controller: "local-time" } }
+%li.card.flex.items-center.justify-between.gap-3.px-4.py-3{ id: dom_id(data_point), data: local_time_data }
   .min-w-0
     %time.block.text-xs.text-gray-500.dark:text-gray-400{ data: { local_time_target: "time" }.merge(metric.ignore_time? ? { date_only: true } : {}), datetime: data_point.recorded_at.iso8601 }= data_point.recorded_at.iso8601
     -# metric_value_display renders Markdown for text_block; plain value_text otherwise.

@@ -1,6 +1,17 @@
 module ApplicationHelper
   def metric_chartable?(metric) = metric.chartable?
 
+  # Data attributes wiring up the local-time Stimulus controller, including the
+  # translated relative-day words it needs to render "Today"/"Yesterday" client
+  # side (the browser's local date decides which day is "today").
+  def local_time_data
+    {
+      controller: "local-time",
+      local_time_today_value: t("dates.today"),
+      local_time_yesterday_value: t("dates.yesterday")
+    }
+  end
+
   # [[recorded_at, numeric_value], ...] for charting; nil for non-chartable types.
   # Numeric types use value_decimal; boolean maps to 1/0; enumerations map to the
   # 0-based index of the chosen option.
