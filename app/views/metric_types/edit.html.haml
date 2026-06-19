@@ -1,7 +1,7 @@
 .card.card-pad
   %h1.page-title.mb-4= t(".title", name: @metric.name)
-  = form_with url: edit_metric_metric_type_path(@metric), method: :get do |f|
-    = f.select :target_type, Metric::DATA_TYPES, { selected: @target_type }, class: "form-select", onchange: "this.form.requestSubmit()"
+  = form_with url: edit_metric_metric_type_path(@metric), method: :get, data: { controller: "auto-submit", action: "change->auto-submit#submit" } do |f|
+    = f.select :target_type, Metric::DATA_TYPES, { selected: @target_type }, class: "form-select"
   - if @report
     %p.mt-4.text-sm.text-gray-600.dark:text-gray-400= t(".convert_report", convertible: @report.convertible, total: @report.total, failing: @report.failing)
     - if @report.samples.any?
