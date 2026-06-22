@@ -116,4 +116,30 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_not_includes display, "<strong>"
     assert_match "**hi**", display
   end
+
+  test "metric_chart_data averages same-day readings into one daily point" do
+    user = User.create!(email: "agg@h.t", password: "password123")
+    m = user.metrics.create!(name: "W", data_type: "decimal")
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 20), value: "72")
+    data = metric_chart_data(m)
+    assert_equal 1, data.size
+    assert_in_delta 71.0, data.first.last.to_f, 0.0001
+  end
+
+  test "metric_chart_data fills empty days with the default" do
+    user = User.create!(email: "fill@h.t", password: "password123")
+    m = user.metrics.create!(name: "W", data_type: "decimal", default_value: "50")
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 3, 8), value: "80")
+    assert_equal [ 70.0, 50.0, 80.0 ], metric_chart_data(m).map { |_, y| y.to_f }
+  end
+
+  test "metric_chart_data does not fill when no default is set" do
+    user = User.create!(email: "nofill@h.t", password: "password123")
+    m = user.metrics.create!(name: "W", data_type: "decimal")
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 3, 8), value: "80")
+    assert_equal [ 70.0, 80.0 ], metric_chart_data(m).map { |_, y| y.to_f }
+  end
 end

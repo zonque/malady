@@ -59,11 +59,9 @@ module OverviewsHelper
     "#{rel} #{I18n.l(local, format: :ov_day_point)}" if rel
   end
 
-  # The numeric y-value for a data point: 1/0 for boolean, the option index for an
-  # enumeration, otherwise the stored decimal.
+  # The numeric y-value for a data point — delegates to the metric so the
+  # projection lives in exactly one place (see Metric#chart_value).
   def chart_y(metric, dp)
-    return dp.value_boolean.nil? ? nil : (dp.value_boolean ? 1 : 0) if metric.boolean?
-    return metric.enum_index(dp.value_text) if metric.enumeration?
-    dp.value_decimal
+    metric.chart_value(dp)
   end
 end
