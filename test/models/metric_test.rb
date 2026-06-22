@@ -68,4 +68,55 @@ class MetricTest < ActiveSupport::TestCase
       assert m.errors[:icon].any?
     end
   end
+
+  test "default_value accepts a castable value for a chartable metric" do
+    m = @user.metrics.build(name: "Weight", data_type: "decimal", default_value: "70")
+    assert m.valid?, m.errors.full_messages.to_sentence
+  end
+
+  test "default_value rejects an uncastable value for a chartable metric" do
+    m = @user.metrics.build(name: "Weight", data_type: "decimal", default_value: "abc")
+    assert_not m.valid?
+    assert m.errors[:default_value].any?
+  end
+
+  test "default_value blank is always allowed" do
+    m = @user.metrics.build(name: "Weight", data_type: "decimal", default_value: "")
+    assert m.valid?, m.errors.full_messages.to_sentence
+  end
+
+  test "default_value is not validated for non-chartable types" do
+    m = @user.metrics.build(name: "Journal", data_type: "text", default_value: "anything")
+    assert m.valid?, m.errors.full_messages.to_sentence
+  end
+
+  test "default_value must be a member for enumeration" do
+    ok = @user.metrics.build(name: "Mood", data_type: "enumeration", enum_options: %w[low high], default_value: "low")
+    bad = @user.metrics.build(name: "Mood2", data_type: "enumeration", enum_options: %w[low high], default_value: "nope")
+    assert ok.valid?, ok.errors.full_messages.to_sentence
+    assert_not bad.valid?
+  end
+
+  test "default_chart_value projects per type, nil when unset" do
+    assert_nil @user.metrics.build(data_type: "decimal").default_chart_value
+    assert_equal 70, @user.metrics.build(data_type: "decimal", default_value: "70").default_chart_value
+    assert_equal 1, @user.metrics.build(data_type: "boolean", default_value: "yes").default_chart_value
+    assert_equal 0, @user.metrics.build(data_type: "boolean", default_value: "no").default_chart_value
+    mood = @user.metrics.build(data_type: "enumeration", enum_options: %w[low ok high], default_value: "high")
+    assert_equal 2, mood.default_chart_value
+  end
+
+  test "chart_value projects a data point per type" do
+    weight = @user.metrics.create!(name: "Weight", data_type: "decimal")
+    dp = weight.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
+    assert_equal 70, weight.chart_value(dp)
+
+    meds = @user.metrics.create!(name: "Meds", data_type: "boolean")
+    dp_yes = meds.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "yes")
+    assert_equal 1, meds.chart_value(dp_yes)
+
+    mood = @user.metrics.create!(name: "Mood", data_type: "enumeration", enum_options: %w[low ok high])
+    dp_high = mood.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "high")
+    assert_equal 2, mood.chart_value(dp_high)
+  end
 end

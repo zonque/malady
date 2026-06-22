@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_14_104423) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_22_120000) do
   create_table "data_points", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "metric_id", null: false
@@ -29,6 +29,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_14_104423) do
     t.string "color"
     t.datetime "created_at", null: false
     t.string "data_type"
+    t.string "default_value"
     t.text "description"
     t.text "enum_options", default: "[]", null: false
     t.string "icon"
