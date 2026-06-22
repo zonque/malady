@@ -198,4 +198,15 @@ class MetricsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :not_found
   end
+
+  test "create persists a default_value" do
+    post metrics_path, params: { metric: { name: "Weight", data_type: "decimal", default_value: "65" } }
+    assert_equal "65", @user.metrics.order(:created_at).last.default_value
+  end
+
+  test "update changes the default_value" do
+    metric = @user.metrics.create!(name: "Weight", data_type: "decimal", default_value: "60")
+    patch metric_path(metric), params: { metric: { default_value: "75" } }
+    assert_equal "75", metric.reload.default_value
+  end
 end

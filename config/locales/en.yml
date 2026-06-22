@@ -59,6 +59,8 @@ en:
       icon_search_placeholder: "Search icons…"
       icon_clear: "Clear"
       icon_count_label: "Loaded: "
+      default_value_label: "Default value"
+      default_value_hint: "Used to fill days with no reading when charting. Leave blank to skip."
     enum_options:
       enum_options_label: "Choices"
       add_choice: "+ Add choice"
