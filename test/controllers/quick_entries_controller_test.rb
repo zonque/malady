@@ -66,4 +66,33 @@ class QuickEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_equal 0, foreign.data_points.count
   end
+
+  test "new badges metrics with no reading logged today" do
+    get new_quick_entry_path
+    assert_response :success
+    assert_select "#metric-row-#{@weight.id} .badge", text: "Not logged today"
+    assert_select "#metric-row-#{@mood.id} .badge", text: "Not logged today"
+  end
+
+  test "new omits the badge for a metric logged today" do
+    @weight.data_points.create!(recorded_at: Time.current, value: "73")
+    get new_quick_entry_path
+    assert_response :success
+    assert_select "#metric-row-#{@weight.id} .badge", false
+    assert_select "#metric-row-#{@mood.id} .badge", text: "Not logged today"
+  end
+
+  test "a reading from yesterday still counts as not logged today" do
+    @weight.data_points.create!(recorded_at: 25.hours.ago, value: "73")
+    get new_quick_entry_path
+    assert_response :success
+    assert_select "#metric-row-#{@weight.id} .badge", text: "Not logged today"
+  end
+
+  test "the badge reappears on the create re-render when nothing is logged today" do
+    post quick_entry_path, params: { recorded_at: "2026-03-01T08:00",
+      values: { @weight.id.to_s => "", @mood.id.to_s => "" } }
+    assert_response :unprocessable_entity
+    assert_select "#metric-row-#{@weight.id} .badge", text: "Not logged today"
+  end
 end

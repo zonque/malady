@@ -150,6 +150,7 @@ en:
       cancel: "Cancel"
       no_metrics_heading: "You have no metrics yet."
       create_metric: "Create a metric"
+      not_logged_today: "Not logged today"
     create:
       logged:
         one: "Logged %{count} reading."
