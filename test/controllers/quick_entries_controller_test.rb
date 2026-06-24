@@ -95,4 +95,12 @@ class QuickEntriesControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     assert_select "#metric-row-#{@weight.id} .badge", text: "Not logged today"
   end
+
+  test "the badge shows on the create re-render when an invalid value is posted" do
+    post quick_entry_path, params: { recorded_at: "2026-03-01T08:00",
+      values: { @weight.id.to_s => "not-a-number", @mood.id.to_s => "" } }
+    assert_response :unprocessable_entity
+    assert_select "#metric-row-#{@weight.id} .badge", text: "Not logged today"
+    assert_select "#metric-row-#{@mood.id} .badge", text: "Not logged today"
+  end
 end

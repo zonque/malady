@@ -45,6 +45,6 @@ class QuickEntriesController < ApplicationController
     @logged_today_ids = current_user.metrics
       .joins(:data_points)
       .where(data_points: { recorded_at: Time.zone.now.all_day })
-      .distinct.pluck(:id).to_set
+      .distinct.pluck("metrics.id").to_set
   end
 end
