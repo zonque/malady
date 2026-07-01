@@ -3,16 +3,12 @@
 
 version: 2
 updates:
-  - package-ecosystem: "bundler"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-    commit-message:
-      prefix: "bundle"
-    groups:
-      ruby-dependencies:
-        update-types: ["minor", "patch"]
+  # NOTE: Bundler version updates are intentionally NOT handled here. Dependabot
+  # bumps listed gems individually and doesn't refresh transitive dependencies,
+  # so it isn't equivalent to `bundle update --all`. The "Bundle update" workflow
+  # (.github/workflows/bundle-update.yml) does that instead. Dependabot *security*
+  # updates for gems still apply (they don't require a config entry), and CI runs
+  # bundler-audit.
 
   - package-ecosystem: "github-actions"
     directory: "/"
