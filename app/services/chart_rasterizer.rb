@@ -1,8 +1,10 @@
 # Rasterizes a metric's readings into one numeric point per period bucket
 # (day/week/month) in the given time zone. Same-bucket readings are averaged.
-# Empty buckets between the first and last reading are filled with the metric's
-# default_chart_value; when no default is set, gaps are left unfilled. Nothing is
-# invented before the first or after the last reading.
+# The series runs from the first reading through the current bucket ("now" in the
+# given zone), so the chart always reaches today rather than stopping at the last
+# reading. Empty buckets — whether between readings or trailing after the last one
+# — are filled with the metric's default_chart_value; when no default is set, gaps
+# are left unfilled. Nothing is invented before the first reading.
 # Pure Ruby (portable across SQLite/Postgres); fine at personal-tracker scale.
 class ChartRasterizer
   PERIODS = %w[day week month].freeze
@@ -19,7 +21,8 @@ class ChartRasterizer
     return [] if averages.empty?
 
     default = @metric.default_chart_value
-    each_bucket(averages.keys.min, averages.keys.max).filter_map do |start|
+    last = [ averages.keys.max, bucket_start(Time.current) ].max
+    each_bucket(averages.keys.min, last).filter_map do |start|
       y = averages.fetch(start, default)
       [ start, y ] unless y.nil?
     end

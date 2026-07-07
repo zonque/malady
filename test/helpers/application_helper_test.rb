@@ -132,7 +132,9 @@ class ApplicationHelperTest < ActionView::TestCase
     m = user.metrics.create!(name: "W", data_type: "decimal", default_value: "50")
     m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
     m.data_points.create!(recorded_at: Time.utc(2026, 1, 3, 8), value: "80")
-    assert_equal [ 70.0, 50.0, 80.0 ], metric_chart_data(m).map { |_, y| y.to_f }
+    travel_to Time.utc(2026, 1, 3, 12) do
+      assert_equal [ 70.0, 50.0, 80.0 ], metric_chart_data(m).map { |_, y| y.to_f }
+    end
   end
 
   test "metric_chart_data does not fill when no default is set" do

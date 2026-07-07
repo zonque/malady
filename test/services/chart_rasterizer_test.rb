@@ -24,9 +24,11 @@ class ChartRasterizerTest < ActiveSupport::TestCase
     m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
     m.data_points.create!(recorded_at: Time.utc(2026, 1, 4, 8), value: "80")
 
-    ys = series(m).map(&:last)
-    # Jan 1 = 70, Jan 2 = 50 (default), Jan 3 = 50 (default), Jan 4 = 80
-    assert_equal [ 70.0, 50.0, 50.0, 80.0 ], ys.map(&:to_f)
+    travel_to Time.utc(2026, 1, 4, 12) do
+      ys = series(m).map(&:last)
+      # Jan 1 = 70, Jan 2 = 50 (default), Jan 3 = 50 (default), Jan 4 = 80
+      assert_equal [ 70.0, 50.0, 50.0, 80.0 ], ys.map(&:to_f)
+    end
   end
 
   test "does not fill gaps when no default is set" do
@@ -34,18 +36,53 @@ class ChartRasterizerTest < ActiveSupport::TestCase
     m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
     m.data_points.create!(recorded_at: Time.utc(2026, 1, 4, 8), value: "80")
 
-    assert_equal [ 70.0, 80.0 ], series(m).map { |_, y| y.to_f }
+    travel_to Time.utc(2026, 1, 4, 12) do
+      assert_equal [ 70.0, 80.0 ], series(m).map { |_, y| y.to_f }
+    end
   end
 
-  test "does not extrapolate before first or after last reading" do
+  test "does not extrapolate before the first reading" do
     m = @user.metrics.create!(name: "Weight", data_type: "decimal", default_value: "50")
     m.data_points.create!(recorded_at: Time.utc(2026, 1, 2, 8), value: "70")
     m.data_points.create!(recorded_at: Time.utc(2026, 1, 3, 8), value: "72")
 
-    starts = series(m).map(&:first)
-    assert_equal Time.utc(2026, 1, 2).to_i, starts.first.to_i
-    assert_equal Time.utc(2026, 1, 3).to_i, starts.last.to_i
-    assert_equal 2, starts.size
+    travel_to Time.utc(2026, 1, 3, 12) do
+      assert_equal Time.utc(2026, 1, 2).to_i, series(m).map(&:first).first.to_i
+    end
+  end
+
+  test "extends the series to the current day, filling gaps with the default" do
+    m = @user.metrics.create!(name: "Weight", data_type: "decimal", default_value: "50")
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
+
+    travel_to Time.utc(2026, 1, 4, 12) do
+      result = series(m)
+      # Jan 1 = 70, then default up to and including "today" (Jan 4).
+      assert_equal Time.utc(2026, 1, 4).to_i, result.map(&:first).last.to_i
+      assert_equal [ 70.0, 50.0, 50.0, 50.0 ], result.map { |_, y| y.to_f }
+    end
+  end
+
+  test "does not extend past the last reading when no default is set" do
+    m = @user.metrics.create!(name: "Weight", data_type: "decimal")
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
+
+    travel_to Time.utc(2026, 1, 4, 12) do
+      # With no default the trailing empty days are dropped, so the series still
+      # ends at the last reading.
+      assert_equal [ Time.utc(2026, 1, 1).to_i ], series(m).map { |s, _| s.to_i }
+    end
+  end
+
+  test "extends to the current day in the given time zone" do
+    m = @user.metrics.create!(name: "Weight", data_type: "decimal", default_value: "50")
+    m.data_points.create!(recorded_at: Time.utc(2026, 1, 1, 8), value: "70")
+
+    # 23:30 UTC on Jan 4 is already Jan 5 in Berlin (UTC+1 in winter).
+    travel_to Time.utc(2026, 1, 4, 23, 30) do
+      last = series(m, zone: "Europe/Berlin").map(&:first).last
+      assert_equal "2026-01-05", last.to_date.to_s
+    end
   end
 
   test "empty metric yields an empty series" do
