@@ -19,6 +19,7 @@ jobs:
             - name: Set up Ruby
               uses: ruby/setup-ruby@v1
               with:
+                  ruby-version: .ruby-version
                   bundler-cache: true
 
             - name: Scan for common Rails security vulnerabilities using static analysis
@@ -40,6 +41,7 @@ jobs:
             - name: Set up Ruby
               uses: ruby/setup-ruby@v1
               with:
+                  ruby-version: .ruby-version
                   bundler-cache: true
 
             - name: Scan for security vulnerabilities in JavaScript dependencies
@@ -59,6 +61,7 @@ jobs:
             - name: Set up Ruby
               uses: ruby/setup-ruby@v1
               with:
+                  ruby-version: .ruby-version
                   bundler-cache: true
 
             - name: Prepare RuboCop cache
@@ -86,6 +89,7 @@ jobs:
             - name: Set up Ruby
               uses: ruby/setup-ruby@v1
               with:
+                  ruby-version: .ruby-version
                   bundler-cache: true
 
             # Same as the Dockerfile (which runs assets:precompile → tailwindcss:build):
